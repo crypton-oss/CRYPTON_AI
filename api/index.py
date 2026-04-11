@@ -13,11 +13,11 @@ from postgrest.exceptions import APIError # Xatoliklarni ushlash uchun
 # --- 1. ASOSIY APP SOZLAMASI ---
 load_dotenv()
 
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
 app = Flask(__name__, 
-            template_folder='../frontend/templates', 
-            static_folder='../frontend/static')
-
-
+            template_folder=os.path.join(base_dir, '../frontend/templates'), 
+            static_folder=os.path.join(base_dir, '../frontend/static'))
 
 app.secret_key = "anonimcrypton@#0091" 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
