@@ -15,6 +15,5 @@
       "src": "/(.*)",
       "dest": "api/index.py"
     }
-  ],
-  "installCommand": "pip install -r requirements.txt"
+  ]
 }

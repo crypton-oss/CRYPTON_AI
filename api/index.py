@@ -19,7 +19,12 @@ app = Flask(__name__,
             template_folder=os.path.join(base_dir, '../frontend/templates'), 
             static_folder=os.path.join(base_dir, '../frontend/static'))
 
-# Vercel-ga app-ni eksport qilish
+@app.route('/')
+def home():
+    # index.html faylingiz frontend/templates ichida bo'lishi kerak
+    return render_template('index.html')
+
+# Vercel uchun
 app = app
 app.secret_key = "anonimcrypton@#0091" 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
