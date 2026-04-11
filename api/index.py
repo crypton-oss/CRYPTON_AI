@@ -12,13 +12,15 @@ from postgrest.exceptions import APIError # Xatoliklarni ushlash uchun
 
 # --- 1. ASOSIY APP SOZLAMASI ---
 load_dotenv()
-
+# api papkasi joylashgan manzil
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__, 
             template_folder=os.path.join(base_dir, '../frontend/templates'), 
             static_folder=os.path.join(base_dir, '../frontend/static'))
 
+# Vercel-ga app-ni eksport qilish
+app = app
 app.secret_key = "anonimcrypton@#0091" 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
