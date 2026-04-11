@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypton AI - Professional Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+        :root {
+            --bg-dark: #09090b;
+            --card-dark: #18181b;
+            --border-dark: #27272a;
+            --accent: #3f3f46;
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        #chat-window::-webkit-scrollbar { width: 6px; }
+        #chat-window::-webkit-scrollbar-track { background: transparent; }
+        #chat-window::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .message-bubble {
+            max-width: 90%;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Markdown styling improvements */
+        .content-area p { margin-bottom: 12px; }
+        .content-area strong { color: #fff; font-weight: 600; }
+        .content-area ul, .content-area ol { margin-left: 20px; margin-bottom: 12px; }
+        .content-area li { margin-bottom: 4px; list-style-position: outside; }
+        .content-area ol { list-style-type: decimal; }
+        .content-area ul { list-style-type: disc; }
+
+        .code-container {
+            background: #000;
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .dropdown-animate {
+            transform-origin: bottom left;
+            animation: scaleIn 0.15s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .ios-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        /* Progress Bar Animation */
+        .progress-container {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dropdown-animate {
+    animation: iosReveal 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: bottom center;
+}
+
+@keyframes iosReveal {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+        filter: blur(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+.v0-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(39, 39, 42, 0.5);
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.v0-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #fafafa;
+    border-radius: 50%;
+    animation: v0-pulse 1.5s infinite ease-in-out;
+}
+
+.v0-dot:nth-child(2) { animation-delay: 0.2s; }
+.v0-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes v0-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Shimmer effekti uchun */
+.skeleton-loader {
+    width: 100%;
+    height: 14px;
+    background: linear-gradient(90deg, #27272a 25%, #3f3f46 50%, #27272a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+
+.animate-in {
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+    </style>
+</head>
+<body class="flex h-screen w-full">
+
+ <div class="hidden md:flex flex-col w-80 border-r border-[#27272a] p-4 h-screen shrink-0 bg-[#09090b]">
+    
+   <button onclick="startNewChat()" id="new-chat-btn" class="flex items-center justify-center gap-2 w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition shrink-0 shadow-sm active:scale-[0.98]">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+    Yangi chat
+</button>
+
+<div class="mt-6 flex-1 overflow-y-auto px-2">
+    <div class="text-[10px] font-bold text-zinc-500 mb-4 px-3 uppercase tracking-widest">Suhbatlar tarixi</div>
+    <div id="chat-history-list" class="space-y-1">
+        </div>
+</div>
+<!-- 
+    <div class="flex-1 overflow-y-auto space-y-2 mt-6 pr-2 custom-scrollbar" id="chat-history-list">
+        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] px-2 mb-2">Tarix</p>
+    </div> -->
+
+    <div class="mt-auto pt-4 relative">
+        <div class="border-t border-[#27272a] pt-4 px-1">
+            
+            <div id="account-dropdown" class="hidden absolute bottom-full left-0 right-0 mb-4 bg-[#161618]/95 backdrop-blur-2xl border border-[#27272a] rounded-[24px] shadow-2xl overflow-hidden dropdown-animate z-50">
+                
+                <div class="p-4 border-b border-[#27272a]/50 flex items-center gap-3 bg-white/[0.02]">
+                    <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-white/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-user text-white text-xs"></i>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-[13px] font-semibold text-white truncate">{{ session.get('user_email', 'Foydalanuvchi') }}</span>
+                        <span class="text-[10px] text-emerald-500 font-medium">Online</span>
+                    </div>
+                </div>
+
+                <div class="p-2 space-y-1">
+                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
+                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
+<g clip-path="url(#clip0_3111_32730)">
+<path d="M12 2C9.38 2 7.25 4.13 7.25 6.75C7.25 9.32 9.26 11.4 11.88 11.49C11.96 11.48 12.04 11.48 12.1 11.49C12.12 11.49 12.13 11.49 12.15 11.49C12.16 11.49 12.16 11.49 12.17 11.49C14.73 11.4 16.74 9.32 16.75 6.75C16.75 4.13 14.62 2 12 2Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M17.08 14.1499C14.29 12.2899 9.73996 12.2899 6.92996 14.1499C5.65996 14.9999 4.95996 16.1499 4.95996 17.3799C4.95996 18.6099 5.65996 19.7499 6.91996 20.5899C8.31996 21.5299 10.16 21.9999 12 21.9999C13.84 21.9999 15.68 21.5299 17.08 20.5899C18.34 19.7399 19.04 18.5999 19.04 17.3599C19.03 16.1299 18.34 14.9899 17.08 14.1499Z" fill="white" style="fill: var(--fillg);"/>
+</g>
+<defs>
+<clipPath id="clip0_3111_32730">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+                        </div>
+                        <span class="font-medium">Profile</span>
+                    </button>
+
+                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
+                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<g clip-path="url(#clip0_4418_9935)">
+<path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M2 12.8794V11.1194C2 10.0794 2.85 9.21945 3.9 9.21945C5.71 9.21945 6.45 7.93945 5.54 6.36945C5.02 5.46945 5.33 4.29945 6.24 3.77945L7.97 2.78945C8.76 2.31945 9.78 2.59945 10.25 3.38945L10.36 3.57945C11.26 5.14945 12.74 5.14945 13.65 3.57945L13.76 3.38945C14.23 2.59945 15.25 2.31945 16.04 2.78945L17.77 3.77945C18.68 4.29945 18.99 5.46945 18.47 6.36945C17.56 7.93945 18.3 9.21945 20.11 9.21945C21.15 9.21945 22.01 10.0694 22.01 11.1194V12.8794C22.01 13.9194 21.16 14.7794 20.11 14.7794C18.3 14.7794 17.56 16.0594 18.47 17.6294C18.99 18.5394 18.68 19.6994 17.77 20.2194L16.04 21.2094C15.25 21.6794 14.23 21.3994 13.76 20.6094L13.65 20.4194C12.75 18.8494 11.27 18.8494 10.36 20.4194L10.25 20.6094C9.78 21.3994 8.76 21.6794 7.97 21.2094L6.24 20.2194C5.33 19.6994 5.02 18.5294 5.54 17.6294C6.45 16.0594 5.71 14.7794 3.9 14.7794C2.85 14.7794 2 13.9194 2 12.8794Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<defs>
+<clipPath id="clip0_4418_9935">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+                        </div>
+                        <span class="font-medium">Settings</span>
+                    </button>
+
+                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
+                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
+<g clip-path="url(#clip0_4418_8619)">
+<path d="M21.5599 10.7401L20.2099 9.16008C19.9599 8.86008 19.7499 8.30008 19.7499 7.90008V6.20008C19.7499 5.14008 18.8799 4.27008 17.8199 4.27008H16.1199C15.7199 4.27008 15.1499 4.06008 14.8499 3.81008L13.2699 2.46008C12.5799 1.87008 11.4499 1.87008 10.7599 2.46008L9.15988 3.81008C8.85988 4.06008 8.29988 4.27008 7.89988 4.27008H6.16988C5.10988 4.27008 4.23988 5.14008 4.23988 6.20008V7.90008C4.23988 8.29008 4.03988 8.85008 3.78988 9.15008L2.43988 10.7401C1.85988 11.4401 1.85988 12.5601 2.43988 13.2401L3.78988 14.8301C4.03988 15.1201 4.23988 15.6901 4.23988 16.0801V17.7901C4.23988 18.8501 5.10988 19.7201 6.16988 19.7201H7.90988C8.29988 19.7201 8.86988 19.9301 9.16988 20.1801L10.7499 21.5301C11.4399 22.1201 12.5699 22.1201 13.2599 21.5301L14.8399 20.1801C15.1399 19.9301 15.6999 19.7201 16.0999 19.7201H17.7999C18.8599 19.7201 19.7299 18.8501 19.7299 17.7901V16.0901C19.7299 15.6901 19.9399 15.1301 20.1899 14.8301L21.5399 13.2501C22.1499 12.5701 22.1499 11.4401 21.5599 10.7401ZM11.2499 8.13008C11.2499 7.72008 11.5899 7.38008 11.9999 7.38008C12.4099 7.38008 12.7499 7.72008 12.7499 8.13008V12.9601C12.7499 13.3701 12.4099 13.7101 11.9999 13.7101C11.5899 13.7101 11.2499 13.3701 11.2499 12.9601V8.13008ZM11.9999 16.8701C11.4499 16.8701 10.9999 16.4201 10.9999 15.8701C10.9999 15.3201 11.4399 14.8701 11.9999 14.8701C12.5499 14.8701 12.9999 15.3201 12.9999 15.8701C12.9999 16.4201 12.5599 16.8701 11.9999 16.8701Z" fill="white" style="fill: var(--fillg);"/>
+</g>
+<defs>
+<clipPath id="clip0_4418_8619">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+                        </div>
+                        <span class="font-medium">About</span>
+                    </button>
+
+                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all border-b border-white/5 pb-3">
+                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
+<g clip-path="url(#clip0_4418_8377)">
+<path d="M7.49997 12.0005C7.49997 11.3374 7.64788 10.7076 7.91075 10.1377C8.11425 9.69642 8.07923 9.15973 7.73563 8.81613L5.15856 6.23906C4.7485 5.829 4.07238 5.85053 3.74139 6.32671C2.62095 7.93866 1.96997 9.89445 1.96997 12.0005C1.96997 14.1048 2.61994 16.0592 3.73274 17.6705C4.06275 18.1483 4.7399 18.1714 5.15104 17.7613L7.73411 15.1848C8.07848 14.8413 8.1139 14.304 7.91029 13.8623C7.64771 13.2926 7.49997 12.6632 7.49997 12.0005Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M12 7.5C12.6631 7.5 13.2928 7.64791 13.8628 7.91078C14.304 8.11428 14.8407 8.07926 15.1843 7.73566L17.7335 5.18643C18.1428 4.77717 18.1223 4.10256 17.6476 3.77141C16.0415 2.65097 14.0844 2 11.97 2C9.86577 2 7.91868 2.64985 6.30974 3.76248C5.83212 4.09277 5.809 4.76993 6.2191 5.18107L8.78017 7.74868C9.12607 8.09546 9.66803 8.12873 10.1116 7.92105C10.6854 7.6524 11.3237 7.5 12 7.5Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M19.89 5.90633C19.7123 5.6767 19.3749 5.66475 19.1694 5.8698L15.9506 9.08034C15.7772 9.25329 15.7573 9.52498 15.8812 9.73622C16.2716 10.4017 16.4999 11.1724 16.4999 12.0002C16.4999 12.8283 16.2715 13.5992 15.8809 14.2647C15.7571 14.4757 15.7768 14.7471 15.9498 14.9201L19.1694 18.1397C19.3749 18.3452 19.7126 18.3334 19.8904 18.1035C21.1956 16.4152 21.9699 14.2971 21.9699 12.0002C21.9699 9.7032 21.1955 7.5934 19.89 5.90633Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M12 16.5004C11.1719 16.5004 10.401 16.2719 9.73546 15.8814C9.52445 15.7576 9.25306 15.7773 9.08006 15.9503L5.83049 19.1999C5.625 19.4053 5.63675 19.7431 5.86665 19.9208C7.55497 21.2261 9.67312 22.0004 11.97 22.0004C14.2771 22.0004 16.3969 21.2254 18.0778 19.9111C18.3057 19.7329 18.3164 19.3968 18.1117 19.1922L14.8871 15.9676C14.7153 15.7958 14.4463 15.775 14.2358 15.8964C13.5727 16.2789 12.8113 16.5004 12 16.5004Z" fill="white" style="fill: var(--fillg);"/>
+</g>
+<defs>
+<clipPath id="clip0_4418_8377">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+                        </div>
+                        <span class="font-medium">Help</span>
+                    </button>
+
+                    <a href="/logout" class="group flex items-center gap-3 w-full p-2 text-[13px] text-red-400 hover:bg-red-500/10 rounded-xl transition-all">
+                        <div class="w-8 h-8 flex items-center justify-center bg-red-500/10 rounded-lg shrink-0">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#b83030">
+<path d="M15.24 22.2705H15.11C10.67 22.2705 8.53002 20.5205 8.16002 16.6005C8.12002 16.1905 8.42002 15.8205 8.84002 15.7805C9.24002 15.7405 9.62002 16.0505 9.66002 16.4605C9.95002 19.6005 11.43 20.7705 15.12 20.7705H15.25C19.32 20.7705 20.76 19.3305 20.76 15.2605V8.74047C20.76 4.67047 19.32 3.23047 15.25 3.23047H15.12C11.41 3.23047 9.93002 4.42047 9.66002 7.62047C9.61002 8.03047 9.26002 8.34047 8.84002 8.30047C8.42002 8.27047 8.12001 7.90047 8.15001 7.49047C8.49001 3.51047 10.64 1.73047 15.11 1.73047H15.24C20.15 1.73047 22.25 3.83047 22.25 8.74047V15.2605C22.25 20.1705 20.15 22.2705 15.24 22.2705Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M15.0001 12.75H3.62012C3.21012 12.75 2.87012 12.41 2.87012 12C2.87012 11.59 3.21012 11.25 3.62012 11.25H15.0001C15.4101 11.25 15.7501 11.59 15.7501 12C15.7501 12.41 15.4101 12.75 15.0001 12.75Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M5.84994 16.0998C5.65994 16.0998 5.46994 16.0298 5.31994 15.8798L1.96994 12.5298C1.67994 12.2398 1.67994 11.7598 1.96994 11.4698L5.31994 8.11984C5.60994 7.82984 6.08994 7.82984 6.37994 8.11984C6.66994 8.40984 6.66994 8.88984 6.37994 9.17984L3.55994 11.9998L6.37994 14.8198C6.66994 15.1098 6.66994 15.5898 6.37994 15.8798C6.23994 16.0298 6.03994 16.0998 5.84994 16.0998Z" fill="white" style="fill: var(--fillg);"/>
+</svg>
+                        </div>
+                        <span class="font-semibold">Chiqish</span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="account-trigger" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-white/[0.05] border border-transparent hover:border-white/10 transition-all cursor-pointer group active:scale-[0.98]">
+                <div class="w-10 h-10 rounded-xl bg-zinc-800 border border-white/5 flex items-center justify-center flex-shrink-0 group-hover:border-white/20 transition-all shadow-lg text-white">
+                    <i class="fa-solid fa-user text-xs"></i>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <p class="text-[13px] font-medium text-zinc-300 truncate tracking-tight group-hover:text-white transition-colors">{{ session.get('user_name', 'Foydalanuvchi') }}</p>
+                    <p class="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">Akkaunt</p>
+                </div>
+                <div class="ml-auto">
+                    <i class="fa-solid fa-ellipsis-vertical text-zinc-700 group-hover:text-zinc-400 text-[10px] transition-colors"></i>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+    <div class="flex-1 flex flex-col h-full relative">
+        <header class="h-14 border-b border-[#27272a] flex items-center justify-between px-6">
+            <div class="flex items-center gap-2">
+                <span class="font-bold tracking-tighter text-xl">CRYPTON <span class="text-zinc-500">AI</span></span>
+            </div>
+            <div class="flex items-center gap-4">
+                 <button class="text-zinc-500 hover:text-white transition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
+            </div>
+        </header>
+
+        <div id="chat-window" class="flex-1 overflow-y-auto p-4 md:px-20 md:py-10 space-y-10">
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-6">
+                <div class="w-16 h-16 bg-zinc-900 border border-[#27272a] rounded-3xl flex items-center justify-center shadow-2xl">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                </div>
+                <h1 class="text-3xl font-bold tracking-tight">Qanday yordam bera olaman?</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl w-full">
+                    <button onclick="useSuggestion('Python-da Telegram bot yozish')" class="p-4 text-sm border border-[#27272a] rounded-2xl text-left hover:bg-zinc-900 hover:border-zinc-700 transition group flex justify-between items-center">
+                        <span>Python-da Telegram bot yozish...</span>
+                        <svg class="opacity-0 group-hover:opacity-100 transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </button>
+                    <button onclick="useSuggestion('Sog\'lom ovqatlanish rejasi')" class="p-4 text-sm border border-[#27272a] rounded-2xl text-left hover:bg-zinc-900 hover:border-zinc-700 transition group flex justify-between items-center">
+                        <span>Sog'lom ovqatlanish rejasi...</span>
+                        <svg class="opacity-0 group-hover:opacity-100 transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="upload-progress-container" class="hidden mx-auto w-full max-w-5xl px-4 md:px-20 mb-3">
+            <div class="bg-[#1c1c1f] border border-[#27272a] rounded-2xl p-4 shadow-2xl flex flex-col gap-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-tighter">Fayl tizimga yuklanmoqda...</span>
+                    </div>
+                    <span id="progress-percent" class="text-[11px] font-mono text-white bg-zinc-800 px-2 py-0.5 rounded-md">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-white w-0 transition-all duration-300 ease-out"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 md:pb-8 md:px-20 w-full max-w-5xl mx-auto">
+           <div id="generating-status" class="hidden mb-4 ml-2">
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-[11px] text-zinc-400 font-bold uppercase tracking-widest">
+            <div class="v0-loading">
+                <div class="v0-dot"></div>
+                <div class="v0-dot"></div>
+                <div class="v0-dot"></div>
+            </div>
+            <span>Crypton AI tahlil qilmoqda...</span>
+        </div>
+        <div class="max-w-[300px] mt-1">
+            <div class="skeleton-loader w-full"></div>
+            <div class="skeleton-loader w-[80%]"></div>
+        </div>
+    </div>
+</div>
+            <div class="relative bg-[#18181b] border border-[#27272a] rounded-[24px] focus-within:border-zinc-600 transition shadow-sm">
+                
+                <div id="attachment-menu" class="hidden absolute bottom-[calc(100%+12px)] left-0 w-56 bg-[#1c1c1f] border border-[#27272a] rounded-2xl shadow-2xl z-50 dropdown-animate overflow-hidden p-1.5">
+                    <button onclick="handleFileUpload('image')" class="flex items-center gap-3 w-full p-3 text-xs text-zinc-300 hover:bg-zinc-800 rounded-xl transition group">
+                        <span class="ios-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+                        Rasm yuklash
+                    </button>
+                    <button disabled onclick="handleFileUpload('document')" class="flex items-center gap-3 w-full p-3 text-xs text-zinc-300 hover:bg-zinc-800 rounded-xl transition group disabled:cursor-not-allowed disabled:opacity-50">
+                        <span class="ios-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+                        Hujjatlar yuklash
+                    </button>
+                    <button disabled onclick="handleFileUpload('video')" class="flex items-center gap-3 w-full p-3 text-xs text-zinc-300 hover:bg-zinc-800 rounded-xl transition group disabled:cursor-not-allowed disabled:opacity-50">
+                        <span class="ios-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+                            </svg>
+                        </span>
+                        Video yuklash
+                    </button>
+
+                </div>
+
+                <div id="image-preview-container" class="hidden relative inline-block mt-4 ml-4">
+                    <img id="image-preview" src="" class="w-20 h-20 object-cover rounded-2xl border border-[#27272a] shadow-md">
+                    <button onclick="removeImage()" class="absolute -top-2 -right-2 bg-white text-black rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold shadow-lg hover:scale-110 transition">✕</button>
+                </div>
+
+                <textarea id="user-input" rows="1" placeholder="Savolingizni bering..." 
+                    class="w-full bg-transparent p-5 pr-14 text-[15px] outline-none resize-none max-h-60 leading-relaxed"
+                    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                
+                <div class="flex items-center justify-between px-3 pb-3">
+               <div class="flex gap-1">
+    <button id="attachment-btn" class="w-10 h-10 rounded-xl hover:bg-zinc-800 text-zinc-400 transition flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+    </button>
+    
+    <button class="w-10 h-10 rounded-xl hover:bg-zinc-800 text-zinc-400 transition flex items-center justify-center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+    </button>
+
+    <div class="relative group">
+        <button id="model-dropdown-btn" class="px-3 h-10 rounded-xl hover:bg-zinc-800 text-zinc-400 transition flex items-center gap-2 border border-transparent hover:border-zinc-700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span id="active-model-display" class="text-[11px] font-bold uppercase tracking-wider">Llama 3</span>
+        </button>
+
+        <div id="model-dropdown-menu" class="hidden absolute bottom-full left-0 mb-3 w-52 bg-[#1c1c1f] border border-[#27272a] rounded-2xl shadow-2xl z-50 dropdown-animate p-1.5">
+           <button disabled onclick="selectModel('Claude 3.5', 'claude')" class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-300 hover:bg-zinc-800 rounded-xl transition uppercase tracking-wide disabled:cursor-not-allowed ">
+    Claude 3.5 Sonnet
+    <i class="fa-solid fa-brain opacity-50"></i>
+</button>
+
+<button onclick="selectModel('Llama 3.1', 'llama')" class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-300 hover:bg-zinc-800 rounded-xl transition uppercase tracking-wide">
+    Llama 3.1 405B
+    <i class="fa-solid fa-bolt opacity-50"></i>
+</button>
+
+<button onclick="selectModel('Mixtral 8x', 'mixtral')" class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-300 hover:bg-zinc-800 rounded-xl transition uppercase tracking-wide">
+    Mixtral 8x7B
+    <i class="fa-solid fa-code opacity-50"></i>
+</button>
+        </div>
+    </div>
+</div>
+                    <button id="send-btn" class="w-10 h-10 bg-white text-black rounded-xl hover:bg-zinc-200 transition flex items-center justify-center shadow-lg disabled:opacity-30">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                    </button>
+                </div>
+            </div>
+            <p class="text-[10px] text-center mt-4 text-zinc-600 font-medium italic">Crypton AI — Professional sun'iy intellekt tizimi v2.0</p>
+        </div>
+    </div>
+
+    <input type="file" id="file-input-image" accept="image/*" class="hidden">
+    <input type="file" id="file-input-doc" accept=".pdf,.doc,.docx,.txt" class="hidden">
+    <input type="file" id="file-input-video" accept="video/*" class="hidden">
+
+    <div id="model-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-6">
+        <div class="bg-[#18181b] border border-[#27272a] w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-5 border-b border-[#27272a] flex justify-between items-center bg-[#1c1c1f]">
+                <span class="font-bold text-sm">Modelni almashtirish</span>
+                <button onclick="toggleModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 transition"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            </div>
+            <div class="p-3 space-y-1" id="model-list">
+                <button onclick="selectModel('GPT-4o Mini')" class="w-full text-left p-3 hover:bg-zinc-800 rounded-xl transition text-sm">GPT-4o Mini (Default)</button>
+                <button onclick="selectModel('Claude 3.5 Sonnet')" class="w-full text-left p-3 hover:bg-zinc-800 rounded-xl transition text-sm">Claude 3.5 Sonnet</button>
+                <button onclick="selectModel('Llama 3.1 405B')" class="w-full text-left p-3 hover:bg-zinc-800 rounded-xl transition text-sm">Llama 3.1 405B</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+let currentChatId = "chat_" + Date.now();
+// Yangi chat yaratish funksiyasi
+
+
+
+
+
+// Sahifa yuklanganda chatlar tarixini yuklash
+async function loadChatList() {
+    try {
+        const response = await fetch('/api/get_chats');
+        const chats = await response.json();
+        
+        const historyContainer = document.getElementById('chat-history-list'); // Sidebardagi container ID si
+        if (!historyContainer) return;
+
+        historyContainer.innerHTML = ''; // Tozalash
+
+        chats.forEach(chat => {
+            const chatItem = document.createElement('div');
+            chatItem.className = "group flex items-center justify-between p-3 mb-1 text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-white rounded-xl cursor-pointer transition-all";
+            chatItem.innerHTML = `
+                <div class="flex items-center gap-3 truncate pr-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    <span class="truncate">${chat.title}</span>
+                </div>
+            `;
+            // Chat ustiga bosganda o'sha chatni yuklash
+            chatItem.onclick = () => loadFullChat(chat.chat_id);
+            historyContainer.appendChild(chatItem);
+        });
+    } catch (err) {
+        console.error("Chat tarixini yuklashda xato:", err);
+    }
+}
+
+// Sahifa yuklanganda chaqiramiz
+window.addEventListener('DOMContentLoaded', loadChatList);
+
+
+function startNewChat() {
+    // 1. Yangi suhbat uchun unikal ID yaratamiz
+    currentChatId = "chat_" + Date.now();
+
+    // 2. Chat oynasini vizual tozalaymiz
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) {
+        // Welcome screen (xuddi v0.dev kabi markazda chiqadi)
+        chatWindow.innerHTML = `
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-0 translate-y-4 animate-in">
+                <div class="w-16 h-16 bg-zinc-900 border border-white/5 rounded-3xl flex items-center justify-center shadow-2xl">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                        <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
+                        <path d="M12 8v4"/><path d="M12 16h.01"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold tracking-tight text-white mb-2 uppercase tracking-widest">Crypton AI</h1>
+                    <p class="text-zinc-500 text-sm">Yangi kiber-tadqiqotni boshlashga tayyorman.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // 3. Inputni tozalaymiz va fokusni unga qaratamiz
+    const userInput = document.getElementById('user-input'); // ID ni tekshirib ko'r
+    if (userInput) {
+        userInput.value = "";
+        userInput.focus();
+    }
+
+    console.log("Yangi chat yaratildi. ID:", currentChatId);
+}
+
+// Sidebarga chat sarlavhasini qo'shish
+function addChatToSidebar(id, title) {
+    const historyList = document.getElementById('chat-history-list');
+    const chatItem = document.createElement('div');
+    chatItem.className = "p-3 text-xs text-zinc-400 hover:bg-white/[0.05] rounded-xl cursor-pointer truncate transition-all";
+    chatItem.innerText = title;
+    chatItem.onclick = () => loadChatHistory(id); // Chatni bazadan yuklash funksiyasi
+    historyList.prepend(chatItem);
+}
+
+// "Yangi chat" tugmasiga event beramiz
+document.getElementById('new-chat-btn').onclick = startNewChat;
+
+
+
+// 1. Sozlamalar va O'zgaruvchilar
+const OPENROUTER_API_KEY = "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";
+let CURRENT_MODEL_ID = "meta-llama/llama-3-70b-instruct";
+let currentModelAlias = "llama"; // Default model sifatida llama (Hermes) turadi
+
+
+const chatWindow = document.getElementById('chat-window');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const status = document.getElementById('generating-status');
+const welcome = document.getElementById('welcome-screen');
+const attachmentBtn = document.getElementById('attachment-btn');
+const attachmentMenu = document.getElementById('attachment-menu');
+
+let selectedImageBase64 = null;
+let selectedImageMime = null;
+
+
+const modelBtn = document.getElementById('model-dropdown-btn');
+const modelMenu = document.getElementById('model-dropdown-menu');
+
+modelBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    modelMenu.classList.toggle('hidden');
+});
+
+// Tashqariga bosilganda yopish
+document.addEventListener('click', () => modelMenu.classList.add('hidden'));
+
+// --- 2. Sidebar va Tarix Funktsiyalari ---
+function useSuggestion(text) {
+    userInput.value = text;
+    userInput.style.height = userInput.scrollHeight + 'px';
+    handleSend();
+}
+
+// --- 3. Modal va Dropdown Boshqaruvi ---
+function toggleModal() {
+    document.getElementById('model-modal').classList.toggle('hidden');
+}
+
+function selectModel(displayName, alias) {
+    currentModelAlias = alias; // Endi bu "claude", "llama" yoki "mixtral" bo'ladi
+    
+    // Tugmadagi yozuvni o'zgartirish
+    const displayElem = document.getElementById('active-model-display');
+    if (displayElem) {
+        displayElem.innerText = displayName;
+    }
+
+    // Dropdownni yopish
+    const modelMenu = document.getElementById('model-dropdown-menu');
+    if (modelMenu) {
+        modelMenu.classList.add('hidden');
+    }
+
+    console.log("Tanlangan model aliashi:", currentModelAlias);
+}
+
+
+
+
+attachmentBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    attachmentMenu.classList.toggle('hidden');
+});
+
+document.addEventListener('click', (e) => {
+    if (!attachmentMenu.contains(e.target) && e.target !== attachmentBtn) {
+        attachmentMenu.classList.add('hidden');
+    }
+});
+
+// --- 4. Fayl Yuklash va Progress Mantiqi ---
+window.handleFileUpload = (type) => {
+    const inputId = type === 'image' ? 'file-input-image' : (type === 'document' ? 'file-input-doc' : 'file-input-video');
+    document.getElementById(inputId).click();
+    attachmentMenu.classList.add('hidden');
+};
+
+document.getElementById('file-input-image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const progressContainer = document.getElementById('upload-progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-percent');
+    
+    progressContainer.classList.remove('hidden');
+    selectedImageMime = file.type;
+
+    const reader = new FileReader();
+
+    reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            progressBar.style.width = percent + '%';
+            progressText.innerText = percent + '%';
+        }
+    };
+
+    reader.onload = (event) => {
+        selectedImageBase64 = event.target.result.split(',')[1];
+        document.getElementById('image-preview').src = event.target.result;
+        document.getElementById('image-preview-container').classList.remove('hidden');
+
+        setTimeout(() => {
+            progressContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+        }, 800);
+    };
+
+    reader.readAsDataURL(file);
+});
+
+function removeImage() {
+    selectedImageBase64 = null;
+    selectedImageMime = null;
+    document.getElementById('file-input-image').value = '';
+    document.getElementById('image-preview-container').classList.add('hidden');
+}
+
+// --- 5. Asosiy Xabar Almashinuvi ---
+async function handleSend() {
+    const text = userInput.value.trim();
+    // Agarda matn ham, rasm ham bo'lmasa, funksiyani to'xtatamiz
+    if (!text && !selectedImageBase64) return;
+
+    const userText = text;
+    const currentImgBase64 = selectedImageBase64;
+    const currentImgMime = selectedImageMime;
+
+    // 1. Foydalanuvchi xabarini ekranga chiqaramiz
+    appendToUI('user', userText, currentImgBase64 ? `data:${currentImgMime};base64,${currentImgBase64}` : null);
+    
+    // 2. Inputni tozalash va loading holatini yoqish
+    userInput.value = "";
+    userInput.style.height = "auto";
+    removeImage();
+    sendBtn.disabled = true;
+    
+    // V0.dev uslubidagi animatsiyani ko'rsatish
+    const statusElem = document.getElementById('generating-status');
+    statusElem.classList.remove('hidden');
+
+    try {
+        // 3. Backendga (main.py) so'rov yuboramiz
+        // Eslatma: OpenRouter kaliti endi Python qismida xavfsiz saqlanadi
+        const response = await fetch("/api/ask", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                query: userText,
+                model: currentModelAlias, // "llama", "claude" yoki "mixtral"
+                image: currentImgBase64, // Agar rasm bo'lsa
+                chat_id: currentChatId
+            })
+        });
+
+      const data = await response.json();
+        
+        // 4. Animatsiyani o'chiramiz
+        statusElem.classList.add('hidden');
+
+        if (data.response) {
+            // AIning javobini harfma-harf chiqarish
+            await streamAIResponse(data.response);
+            
+            // --- MANA SHU YERGA QO'SHAMIZ ---
+            // Xabar yuborilgach va AI javob bergach, sidebarni yangilaymiz
+            if (typeof loadChatList === "function") {
+                loadChatList();
+            }
+            // --------------------------------
+            
+        } else if (data.error) {
+            appendToUI('ai', "Xatolik: " + data.error);
+        }
+
+    } catch (err) {
+        statusElem.classList.add('hidden');
+        appendToUI('ai', "Xatolik: Server bilan ulanishda muammo yuz berdi.");
+        console.error(err);
+    } finally {
+        sendBtn.disabled = false;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+}
+
+// --- 6. UI Elementlarini Yaratish ---
+function appendToUI(role, text, imageSrc = null) {
+    welcome.classList.add('hidden');
+    const div = document.createElement('div');
+    div.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} w-full mb-6 animate-fadeIn`;
+    
+    const bubbleClass = role === 'user' 
+        ? 'bg-[#27272a] border border-[#3f3f46] text-[#fafafa] ml-auto' 
+        : 'text-zinc-200';
+
+    div.innerHTML = `
+        <div class="message-bubble ${bubbleClass} p-5 rounded-[22px] shadow-sm">
+            ${imageSrc ? `<img src="${imageSrc}" class="max-w-xs rounded-2xl mb-3 border border-[#27272a] shadow-lg">` : ''}
+            <div class="content-area">${formatContent(text)}</div>
+        </div>
+    `;
+    
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return div;
+}
+
+async function streamAIResponse(fullText) {
+    status.classList.remove('hidden');
+    const div = appendToUI('ai', "");
+    const contentArea = div.querySelector('.content-area');
+    let currentText = "";
+    const chars = fullText.split("");
+
+    for (let i = 0; i < chars.length; i++) {
+        currentText += chars[i];
+        if (i % 2 === 0) {
+            contentArea.innerHTML = formatContent(currentText);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+        await new Promise(r => setTimeout(r, 10));
+    }
+    contentArea.innerHTML = formatContent(fullText);
+    status.classList.add('hidden');
+}
+
+function formatContent(text) {
+    if (!text) return "";
+    const codeRegex = /```(\w+)?([\s\S]*?)```/g;
+    let formatted = text.replace(codeRegex, (match, lang, code) => {
+        const id = 'code-' + Math.random().toString(36).substr(2, 9);
+        return `
+            <div class="code-container my-4">
+                <div class="flex justify-between items-center px-4 py-2 bg-[#18181b] border-b border-[#27272a]">
+                    <span class="text-[10px] font-bold text-zinc-500 uppercase">${lang || 'code'}</span>
+                    <button onclick="copyCode('${id}', this)" class="text-[10px] text-zinc-500 hover:text-white font-bold uppercase">Nusxa olish</button>
+                </div>
+                <pre id="${id}" class="p-4 overflow-x-auto text-[13px] text-zinc-300 font-mono leading-relaxed"><code>${escapeHtml(code.trim())}</code></pre>
+            </div>`;
+    });
+    return formatted.replace(/\n/g, '<br>');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+window.copyCode = (id, btn) => {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+    btn.innerText = 'Nusxalandi!';
+    setTimeout(() => btn.innerText = 'Nusxa olish', 2000);
+};
+
+// Eventlar
+sendBtn.addEventListener('click', handleSend);
+userInput.addEventListener('keydown', e => { 
+    if (e.key === 'Enter' && !e.shiftKey) { 
+        e.preventDefault(); 
+        handleSend(); 
+    } 
+});
+
+const accountTrigger = document.getElementById('account-trigger');
+const accountDropdown = document.getElementById('account-dropdown');
+
+// Menyuni ochish va yopish
+accountTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    accountDropdown.classList.toggle('hidden');
+});
+
+// Tashqariga bosilganda menyuni yopish
+document.addEventListener('click', (e) => {
+    if (!accountDropdown.contains(e.target) && e.target !== accountTrigger) {
+        accountDropdown.classList.add('hidden');
+    }
+});
+
+
+
+
+async function loadFullChat(chatId) {
+    currentChatId = chatId; // Global chat ID-ni yangilaymiz
+    console.log("Yuklanayotgan chat ID:", chatId);
+    
+    // Chat oynasini tozalash
+    const chatWindow = document.getElementById('chat-window');
+    chatWindow.innerHTML = '<div class="text-center text-zinc-500 py-10">Yuklanmoqda...</div>';
+
+    try {
+        const response = await fetch(`/api/get_messages/${chatId}`);
+        const messages = await response.json();
+        
+        chatWindow.innerHTML = ''; // Tozalash
+        messages.forEach(msg => {
+            appendToUI(msg.role, msg.content);
+        });
+    } catch (err) {
+        console.error("Xabarlarni yuklashda xato:", err);
+    }
+}
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadChatList();
+});
+    </script>
+</body>
+</html>

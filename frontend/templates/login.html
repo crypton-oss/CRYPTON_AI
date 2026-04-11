@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypton AI - Dark Sign In</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Fon qop-qora bo'lishi uchun */
+        body {
+            background-color: #000000;
+        }
+        /* Maxsus kiber-shisha effekti (Glassmorphism) */
+        .dark-card {
+            background: #0a0a0a;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+        .dark-input {
+            background-color: #121212 !important;
+            border-color: #262626 !important;
+            color: #ffffff !important;
+        }
+        .dark-input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md dark-card rounded-[2.5rem] p-10 flex flex-col items-center text-white transition-all hover:border-zinc-700">
+        
+        <!-- <div class="flex items-center justify-center w-16 h-16 rounded-2xl bg-zinc-900 mb-8 border border-zinc-800 shadow-inner"> -->
+            <!-- <i data-lucide="log-in" class="w-8 h-8 text-blue-500"></i> -->
+             <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="#fff">
+<path d="M16.8 2H14.2C11 2 9 4 9 7.2V11.25H13.44L11.37 9.18C11.22 9.03 11.15 8.84 11.15 8.65C11.15 8.46 11.22 8.27 11.37 8.12C11.66 7.83 12.14 7.83 12.43 8.12L15.78 11.47C16.07 11.76 16.07 12.24 15.78 12.53L12.43 15.88C12.14 16.17 11.66 16.17 11.37 15.88C11.08 15.59 11.08 15.11 11.37 14.82L13.44 12.75H9V16.8C9 20 11 22 14.2 22H16.79C19.99 22 21.99 20 21.99 16.8V7.2C22 4 20 2 16.8 2Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M2.75 11.25C2.34 11.25 2 11.59 2 12C2 12.41 2.34 12.75 2.75 12.75H9V11.25H2.75Z" fill="white" style="fill: var(--fillg);"/>
+</svg>
+        <!-- </div> -->
+<br>
+        <h2 class="text-3xl font-bold mb-3 text-center tracking-tight">
+            Email bilan hisobga kirish
+        </h2>
+        <p class="text-zinc-500 text-md mb-8 text-center leading-relaxed px-2">
+            Tizimga kirish uchun Email va parolni kiriting. Agar hisobingiz bo'lmasa, <a href="/register" class="text-blue-500 hover:underline">ro'yxatdan o'ting</a>.
+        </p>
+
+        <div class="w-full flex flex-col gap-4 mb-4">
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </span>
+                <input
+                    id="emailInput"
+                    placeholder="Email"
+                    type="email"
+                    class="dark-input w-full pl-12 pr-4 py-4 rounded-2xl border text-md transition-all outline-none"
+                />
+            </div>
+
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
+                </span>
+                <input
+                    id="passwordInput"
+                    placeholder="Password"
+                    type="password"
+                    class="dark-input w-full pl-12 pr-12 py-4 rounded-2xl border text-md transition-all outline-none"
+                />
+                <span id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 cursor-pointer select-none hover:text-white transition-colors">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </span>
+            </div>
+
+            <div id="errorMessage" class="hidden text-sm text-red-400 text-left font-medium ml-2"></div>
+
+            <div class="w-full flex justify-end">
+                <button disabled class="text-sm text-zinc-500 hover:text-blue-500 transition-colors disabled:cursor-not-allowed disabled:text-zinc-700">
+                    Forgot password?
+                </button>
+            </div>
+        </div>
+
+        <button
+            id="signInBtn"
+            class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-lg hover:bg-zinc-200 active:scale-[0.98] transition-all mb-8 mt-4 text-lg"
+        >
+            Login
+        </button>
+
+        <div class="flex items-center w-full mb-6">
+            <div class="flex-grow border-t border-zinc-800"></div>
+            <span class="mx-4 text-xs text-zinc-600 uppercase tracking-widest font-bold">Or sign in with</span>
+            <div class="flex-grow border-t border-zinc-800"></div>
+        </div>
+
+        <div class="flex gap-4 w-full justify-center">
+           <a href="/login/google" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-6 h-6" />
+</a>
+       
+
+            <button title="GitHub orqali kirish" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+                <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="GitHub" class="w-7 h-7 invert" />
+            </button>
+
+            <button title="Apple orqali kirish" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+                <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" class="w-6 h-6 invert" />
+            </button>
+        </div>
+    </div>
+
+ <script>
+    lucide.createIcons();
+
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const signInBtn = document.getElementById('signInBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const togglePassword = document.getElementById('togglePassword');
+
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    togglePassword.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        const iconName = type === 'password' ? 'eye' : 'eye-off';
+        togglePassword.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+        lucide.createIcons();
+    });
+
+    signInBtn.addEventListener('click', async () => {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (!email || !password) {
+            showError("Iltimos, email va parolni to'liq kiriting.");
+            return;
+        }
+        if (!validateEmail(email)) {
+            showError("Email formati noto'g'ri.");
+            return;
+        }
+
+        signInBtn.disabled = true;
+        signInBtn.innerText = "Checking...";
+        signInBtn.classList.add('opacity-50');
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = result.redirect;
+            } else {
+                showError(result.message);
+                resetButton();
+            }
+        } catch (error) {
+            showError("Server bilan aloqa uzildi.");
+            resetButton();
+        }
+    });
+
+    function resetButton() {
+        signInBtn.disabled = false;
+        signInBtn.innerText = "Login";
+        signInBtn.classList.remove('opacity-50');
+    }
+
+    function showError(text) {
+        errorMessage.textContent = text;
+        errorMessage.classList.remove('hidden');
+        errorMessage.classList.add('animate-pulse');
+        setTimeout(() => errorMessage.classList.remove('animate-pulse'), 1000);
+    }
+</script>
+</body>
+</html>

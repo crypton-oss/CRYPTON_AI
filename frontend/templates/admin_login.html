@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypton AI - Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow: hidden; }
+
+        /* iOS Segmented Control */
+        .segmented-control {
+            background: #1c1c1e;
+            border-radius: 12px;
+            padding: 2px;
+            display: flex;
+            position: relative;
+            width: 220px;
+            margin: 0 auto 40px auto;
+            user-select: none;
+        }
+
+        .segmented-control button {
+            flex: 1;
+            padding: 8px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #8e8e93;
+            z-index: 10;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .segmented-control button.active { color: #fff; }
+
+        .selection-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: calc(50% - 2px);
+            height: calc(100% - 4px);
+            background: #3a3a3c;
+            border-radius: 10px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+        }
+
+        .login-view {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            width: 100%;
+            top: 0;
+        }
+
+        .hidden-view {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95) translateY(10px);
+        }
+
+        .num-btn {
+            width: 75px; height: 75px;
+            border-radius: 50%;
+            background: #1c1c1e;
+            font-size: 28px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .num-btn:active { background: #3a3a3c; }
+
+        .dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 2px solid #3a3a3c;
+            transition: 0.2s;
+        }
+        .dot.fill { background: #fff; border-color: #fff; box-shadow: 0 0 10px #fff; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .shake { animation: shake 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6">
+
+    <div id="ios-toast" class="fixed top-10 left-1/2 -translate-x-1/2 z-[1000] pointer-events-none transition-all duration-500 opacity-0 -translate-y-10">
+        <div class="bg-[#1c1c1e]/90 backdrop-blur-xl border border-zinc-800 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+            <div id="toast-icon" class="w-6 h-6 rounded-full flex items-center justify-center"></div>
+            <span id="toast-message" class="text-white text-sm font-medium"></span>
+        </div>
+    </div>
+
+    <div class="w-full max-w-sm text-center">
+        <div class="mb-10">
+            <h1 class="text-2xl font-bold tracking-[0.2em] uppercase">Crypton <span class="text-blue-500">AI</span></h1>
+            <p class="text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">Secure Access</p>
+        </div>
+
+        <div class="segmented-control">
+            <div id="slider" class="selection-slider"></div>
+            <button id="btn-pass" class="active" onclick="switchTab('pass')">Password</button>
+            <button id="btn-pin" onclick="switchTab('pin')">PIN</button>
+        </div>
+
+        <div class="relative min-h-[350px]">
+            <div id="view-pass" class="login-view">
+                <form action="/admin-login" method="POST" class="space-y-4">
+                    <input type="text" name="username" placeholder="Username" required
+                        class="w-full bg-[#1c1c1e] rounded-xl px-5 py-4 outline-none border border-transparent focus:border-zinc-700 transition">
+                    <input type="password" name="password" placeholder="Password" required
+                        class="w-full bg-[#1c1c1e] rounded-xl px-5 py-4 outline-none border border-transparent focus:border-zinc-700 transition">
+                    <button type="submit" class="w-full bg-white text-black font-bold py-4 rounded-xl mt-4 active:scale-95 transition">
+                        Kirish
+                    </button>
+                </form>
+            </div>
+
+            <div id="view-pin" class="login-view hidden-view">
+                <div class="flex flex-col items-center">
+                    <div id="pin-dots" class="flex gap-5 mb-10">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-4">
+                        <button onclick="addPin('1')" class="num-btn">1</button>
+                        <button onclick="addPin('2')" class="num-btn">2</button>
+                        <button onclick="addPin('3')" class="num-btn">3</button>
+                        <button onclick="addPin('4')" class="num-btn">4</button>
+                        <button onclick="addPin('5')" class="num-btn">5</button>
+                        <button onclick="addPin('6')" class="num-btn">6</button>
+                        <button onclick="addPin('7')" class="num-btn">7</button>
+                        <button onclick="addPin('8')" class="num-btn">8</button>
+                        <button onclick="addPin('9')" class="num-btn">9</button>
+                        <div class="w-[75px]"></div>
+                        <button onclick="addPin('0')" class="num-btn">0</button>
+                        <button onclick="delPin()" class="flex items-center justify-center text-zinc-500 active:text-white">
+                            <i data-lucide="delete" class="w-8 h-8"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentPin = "";
+
+        // Toast funksiyasi
+        function showIOSToast(message, type = 'success') {
+            const toast = document.getElementById('ios-toast');
+            const msg = document.getElementById('toast-message');
+            const icon = document.getElementById('toast-icon');
+
+            msg.innerText = message;
+            if (type === 'success') {
+                icon.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white"></i>';
+                icon.className = "w-6 h-6 rounded-full flex items-center justify-center bg-green-500";
+            } else {
+                icon.innerHTML = '<i data-lucide="x" class="w-4 h-4 text-white"></i>';
+                icon.className = "w-6 h-6 rounded-full flex items-center justify-center bg-red-500";
+            }
+            lucide.createIcons();
+            
+            toast.classList.remove('opacity-0', '-translate-y-10');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-10');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2500);
+        }
+
+        function switchTab(mode) {
+            const slider = document.getElementById('slider');
+            const viewPass = document.getElementById('view-pass');
+            const viewPin = document.getElementById('view-pin');
+            const btnPass = document.getElementById('btn-pass');
+            const btnPin = document.getElementById('btn-pin');
+
+            if(mode === 'pass') {
+                slider.style.transform = 'translateX(0)';
+                viewPass.classList.remove('hidden-view');
+                viewPin.classList.add('hidden-view');
+                btnPass.classList.add('active');
+                btnPin.classList.remove('active');
+            } else {
+                slider.style.transform = 'translateX(100%)';
+                viewPass.classList.add('hidden-view');
+                viewPin.classList.remove('hidden-view');
+                btnPin.classList.add('active');
+                btnPass.classList.remove('active');
+            }
+        }
+
+        function addPin(num) {
+            if(currentPin.length < 4) {
+                currentPin += num;
+                updateDots();
+                if(currentPin.length === 4) {
+                    setTimeout(submitPin, 100);
+                }
+            }
+        }
+
+        function delPin() {
+            currentPin = currentPin.slice(0, -1);
+            updateDots();
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                i < currentPin.length ? dot.classList.add('fill') : dot.classList.remove('fill');
+            });
+        }
+
+        async function submitPin() {
+            try {
+                const res = await fetch('/admin-pin-login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({pin: currentPin})
+                });
+
+                if(res.ok) {
+                    showIOSToast("Xush kelibsiz!", "success");
+                    setTimeout(() => {
+                        window.location.replace("/crypton-manager-2026-auth"); 
+                    }, 1000);
+                } else {
+                    showIOSToast("PIN-kod noto'g'ri!", "error");
+                    const dotsContainer = document.getElementById('pin-dots');
+                    dotsContainer.classList.add('shake');
+                    setTimeout(() => {
+                        dotsContainer.classList.remove('shake');
+                        currentPin = "";
+                        updateDots();
+                    }, 400);
+                }
+            } catch (err) {
+                showIOSToast("Aloqa xatosi!", "error");
+            }
+        }
+    </script>
+</body>
+</html>

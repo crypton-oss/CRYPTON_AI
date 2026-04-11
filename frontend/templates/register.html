@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypton AI - Ro'yxatdan o'tish</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #000000;
+        }
+        /* Login bilan bir xil kiber-shisha effekti */
+        .dark-card {
+            background: #0a0a0a;
+            border: 1px solid #1f1f1f;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+        .dark-input {
+            background-color: #121212 !important;
+            border-color: #262626 !important;
+            color: #ffffff !important;
+        }
+        .dark-input:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md dark-card rounded-[2.5rem] p-10 flex flex-col items-center text-white transition-all hover:border-zinc-700">
+        
+        <div class="mb-6">
+           <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none">
+<g clip-path="url(#clip0_3111_32751)">
+<path d="M18.5 19.5H14.5" stroke="#faeded" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M16.5 21.5V17.5" stroke="#faeded" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.4501 10.79 7.5601 8.84 7.5601 6.44C7.5501 3.99 9.5401 2 11.9901 2C14.4401 2 16.4301 3.99 16.4301 6.44C16.4301 8.84 14.5301 10.79 12.1601 10.87Z" stroke="#faeded" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+<path d="M11.99 21.8097C10.17 21.8097 8.36004 21.3497 6.98004 20.4297C4.56004 18.8097 4.56004 16.1697 6.98004 14.5597C9.73004 12.7197 14.24 12.7197 16.99 14.5597" stroke="#faeded" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<defs>
+<clipPath id="clip0_3111_32751">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+        </div>
+
+        <h2 class="text-3xl font-bold mb-2 text-center tracking-tight">
+            Ro'yxatdan o'tish
+        </h2>
+        <p class="text-zinc-500 text-md mb-8 text-center leading-relaxed">
+            Crypton AI olamiga xush kelibsiz. Agar hisobingiz bo'lsa<a href="/login" class="text-blue-500 hover:underline">tizimga kiring</a>.
+        </p>
+
+        <form id="registerForm" action="/register" method="POST" class="w-full flex flex-col gap-4 mb-4">
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </span>
+                <input
+                    name="username"
+                    placeholder="Username"
+                    type="text"
+                    required
+                    class="dark-input w-full pl-12 pr-4 py-4 rounded-2xl border text-md transition-all outline-none"
+                />
+            </div>
+
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </span>
+                <input
+                    name="email"
+                    placeholder="Email"
+                    type="email"
+                    required
+                    class="dark-input w-full pl-12 pr-4 py-4 rounded-2xl border text-md transition-all outline-none"
+                />
+            </div>
+
+            <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
+                </span>
+                <input
+                    id="passwordInput"
+                    name="password"
+                    placeholder="Yangi parol"
+                    type="password"
+                    required
+                    class="dark-input w-full pl-12 pr-12 py-4 rounded-2xl border text-md transition-all outline-none"
+                />
+                <span id="togglePassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 cursor-pointer select-none hover:text-white transition-colors">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                </span>
+            </div>
+
+            <div id="errorMessage" class="hidden text-sm text-red-400 text-left font-medium ml-2"></div>
+
+            <button
+                type="submit"
+                id="registerBtn"
+                class="w-full bg-white text-black font-bold py-4 rounded-2xl shadow-lg hover:bg-zinc-200 active:scale-[0.98] transition-all mb-4 mt-2 text-lg"
+            >
+                Hisob yaratish
+            </button>
+        </form>
+
+        <div class="flex items-center w-full mb-6">
+            <div class="flex-grow border-t border-zinc-800"></div>
+            <span class="mx-4 text-xs text-zinc-600 uppercase tracking-widest font-bold">Yoki tezkor ulanish</span>
+            <div class="flex-grow border-t border-zinc-800"></div>
+        </div>
+
+        <div class="flex gap-4 w-full justify-center">
+            <a href="/login/google" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-6 h-6" />
+            </a>
+
+            <button title="GitHub" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+                <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="GitHub" class="w-7 h-7 invert" />
+            </button>
+
+            <button title="Apple" class="flex items-center justify-center w-14 h-14 rounded-2xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800 transition-all grow">
+                <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" class="w-6 h-6 invert" />
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassword = document.getElementById('togglePassword');
+        const registerBtn = document.getElementById('registerBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Parolni ko'rsatish/yashirish
+        togglePassword.addEventListener('click', () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            const iconName = type === 'password' ? 'eye' : 'eye-off';
+            togglePassword.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
+            lucide.createIcons();
+        });
+
+        // Formani yuborishda vizual effekt
+        document.getElementById('registerForm').addEventListener('submit', function() {
+            registerBtn.disabled = true;
+            registerBtn.innerText = "Yaratilmoqda...";
+            registerBtn.classList.add('opacity-50');
+        });
+
+        function showError(text) {
+            errorMessage.textContent = text;
+            errorMessage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

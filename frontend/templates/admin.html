@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypton AI - Admin Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; overflow: hidden; }
+        .sidebar { width: 280px; height: 100vh; background: #050505; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 24px; color: #a1a1aa; cursor: pointer; border-left: 3px solid transparent; transition: 0.2s; }
+        .menu-item:hover, .menu-item.active { background: #111; color: #fff; border-left-color: #3b82f6; }
+        .main-content { flex-grow: 1; height: 100vh; overflow-y: auto; background: #000; }
+        .glass-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 16px; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Xabar yo'qolayotganda silliq ketishi uchun */
+        .opacity-0 {
+            opacity: 0 !important;
+            transition: opacity 0.5s ease;
+        }
+        .translate-x-10 {
+            transform: translateX(40px);
+            transition: transform 0.5s ease;
+        }
+
+        /* Sen yuborgan dizayn asosida xabarnoma stillari */
+.error {
+    width: 320px;
+    padding: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    background: #10b981; /* Default: Yashil (Success) */
+    border-radius: 8px;
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.5);
+    pointer-events: auto;
+    transition: all 0.4s ease;
+}
+
+/* Har xil holatlar uchun ranglar */
+.error.is-delete { background: #EF665B; } /* O'chirishda - Qizil */
+.error.is-block { background: #f59e0b; }  /* Bloklashda - Sariq */
+
+.error__icon { width: 20px; height: 20px; margin-right: 8px; flex-shrink: 0; }
+.error__icon path { fill: #fff; }
+.error__title { font-weight: 500; font-size: 14px; color: #fff; }
+.error__close { width: 20px; height: 20px; cursor: pointer; margin-left: auto; }
+.error__close path { fill: #fff; }
+    </style>
+</head>
+<body class="flex">
+
+    <aside class="sidebar">
+        <div class="p-8">
+            <h1 class="text-xl font-bold tracking-widest uppercase text-white">Crypton <span class="text-blue-500">AI</span></h1>
+            <p class="text-[10px] text-zinc-500 mt-1 uppercase tracking-tighter">Admin Dashboard v2.0</p>
+        </div>
+        <nav class="flex-grow mt-4">
+            <div class="menu-item active" onclick="loadTab('users')"><i data-lucide="users" class="w-5 h-5"></i><span>Foydalanuvchilar</span></div>
+            <div class="menu-item" onclick="loadTab('premium')"><i data-lucide="gem" class="w-5 h-5"></i><span>Premium foydalanuvchilar</span></div>
+            <div class="menu-item text-orange-500" onclick="loadTab('block')"><i data-lucide="shield-alert" class="w-5 h-5"></i><span>Bloklash</span></div>
+            <div class="menu-item" onclick="loadTab('blocked_list')"><i data-lucide="user-x" class="w-5 h-5"></i><span>Bloklanganlar</span></div>
+            <div class="menu-item" onclick="loadTab('ip_addresses')"><i data-lucide="globe" class="w-5 h-5"></i><span>IP manzillar</span></div>
+            <div class="menu-item" onclick="loadTab('settings')"><i data-lucide="settings" class="w-5 h-5"></i><span>Sozlamalar</span></div>
+           <div class="menu-item text-red-500" onclick="loadBlacklistData(event)">
+    <i data-lucide="shield-ban" class="w-5 h-5"></i>
+    <span>Qora Ro'yxat (Logs)</span>
+</div>
+<div class="menu-item text-purple-500" onclick="loadCookieLogs(event)">
+    <i data-lucide="fingerprint" class="w-5 h-5"></i>
+    <span>Cookie Logs</span>
+</div>
+
+<div class="menu-item text-orange-500" onclick="openPinModal()">
+    <i data-lucide="lock" class="w-5 h-5"></i>
+    <span>PIN Sozlamalari</span>
+</div>
+        </nav>
+        <div class="p-4 border-t border-zinc-900">
+            <a href="/admin-logout" class="menu-item text-red-500 hover:bg-red-500/10 rounded-xl"><i data-lucide="log-out" class="w-5 h-5"></i><span>Chiqish</span></a>
+        </div>
+    </aside>
+
+    <main id="main-content" class="main-content p-10">
+        <header class="mb-10 flex justify-between items-center">
+            <div>
+                <h2 id="tabTitle" class="text-3xl font-bold text-white">Foydalanuvchilar</h2>
+                <p id="tabDesc" class="text-zinc-500 mt-1">Barcha ro'yxatdan o'tgan a'zolar boshqaruvi</p>
+            </div>
+            <div class="flex gap-3">
+                <div class="px-4 py-2 glass-card flex items-center gap-2 border-zinc-800">
+                    <span class="text-zinc-500 text-xs uppercase font-bold tracking-widest">Jami:</span>
+                    <span id="totalUsers" class="text-blue-500 font-bold">0</span>
+                </div>
+                <button onclick="fetchUsers()" class="p-3 glass-card hover:bg-zinc-900 transition text-zinc-400 border-zinc-800">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="glass-card overflow-hidden">
+            <table class="w-full text-left">
+                <thead class="bg-zinc-900/50 text-zinc-500 text-xs uppercase tracking-widest">
+                    <tr>
+                        <th class="p-5">Foydalanuvchi</th>
+                        <th class="p-5">Email</th>
+                        <th class="p-5">Parol</th>
+                        <th class="p-5 text-right">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody" class="divide-y divide-zinc-900"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="toast" class="fixed bottom-10 right-10 transform translate-y-20 opacity-0 transition-all duration-300 z-[200]">
+        <div class="glass-card px-6 py-4 flex items-center gap-3 border-l-4 border-blue-500 shadow-2xl">
+            <div id="toastIcon" class="text-blue-500"></div>
+            <p id="toastMessage" class="text-sm font-medium text-white"></p>
+        </div>
+    </div>
+
+  
+
+    <div id="customModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[110] p-4">
+        <div class="glass-card max-w-sm w-full p-8 text-center border border-zinc-800 shadow-2xl">
+            <div id="modalIcon" class="mb-4 flex justify-center text-blue-500">
+                <i data-lucide="shield-question" class="w-12 h-12"></i>
+            </div>
+            <h3 id="modalTitle" class="text-xl font-bold mb-2">Tasdiqlash</h3>
+            <p id="modalDescription" class="text-zinc-400 text-sm mb-8 leading-relaxed">Haqiqatdan ham ushbu amalni bajarmoqchimisiz?</p>
+            
+            <div class="flex gap-3">
+                <button id="modalCancel" class="flex-1 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition font-medium border border-zinc-800">Orqaga</button>
+                <button id="modalConfirm" class="flex-1 py-3 rounded-xl bg-white text-black hover:bg-zinc-200 transition font-bold">Tasdiqlash</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[500] hidden flex items-center justify-center p-4">
+    <div class="bg-[#1c1c1e] w-full max-w-xs rounded-2xl p-6 border border-zinc-800 shadow-2xl">
+        <h3 class="text-white text-lg font-semibold text-center mb-6">PIN-kodni yangilash</h3>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase tracking-widest ml-1">Yangi PIN</label>
+                <input type="password" id="new-pin" maxlength="4" placeholder="••••" 
+                    class="w-full bg-black border border-zinc-800 rounded-xl py-3 text-center text-xl tracking-[1em] text-white outline-none focus:border-orange-500 transition">
+            </div>
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase tracking-widest ml-1">PIN-ni tasdiqlang</label>
+                <input type="password" id="confirm-pin" maxlength="4" placeholder="••••" 
+                    class="w-full bg-black border border-zinc-800 rounded-xl py-3 text-center text-xl tracking-[1em] text-white outline-none focus:border-orange-500 transition">
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button onclick="closePinModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 text-white text-sm font-medium hover:bg-zinc-700 transition">Bekor qilish</button>
+                <button onclick="saveNewPin()" class="flex-1 py-3 rounded-xl bg-orange-600 text-white text-sm font-bold hover:bg-orange-500 transition shadow-lg shadow-orange-900/20">Saqlash</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ios-toast" class="fixed top-10 left-1/2 -translate-x-1/2 z-[1000] pointer-events-none transition-all duration-500 opacity-0 -translate-y-10">
+    <div class="bg-[#1c1c1e]/90 backdrop-blur-xl border border-zinc-800 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div id="toast-icon" class="w-6 h-6 rounded-full flex items-center justify-center"></div>
+        <span id="toast-message" class="text-white text-sm font-medium"></span>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed top-5 right-5 z-[999] flex flex-col gap-3 pointer-events-none" style="min-width: 320px; min-height: 20px;"></div>
+    <script>
+
+
+// Bu qiymat main.py dagi ADMIN_SECRET_URL bilan bir xil bo'lishi shart!
+const ADMIN_KEY = "crypton-manager-2026-auth";
+        let currentTab = 'users';
+
+        
+        function openPinModal() {
+            document.getElementById('pin-modal').classList.remove('hidden');
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('new-pin').value = "";
+            document.getElementById('confirm-pin').value = "";
+        }
+
+        async function saveNewPin() {
+            const newPin = document.getElementById('new-pin').value;
+            const confirmPin = document.getElementById('confirm-pin').value;
+
+            if (newPin.length !== 4) {
+                alert("PIN 4 ta raqam bo'lishi shart!");
+                return;
+            }
+
+            if (newPin !== confirmPin) {
+                alert("PIN-kodlar bir-biriga mos kelmadi!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/${ADMIN_KEY}/update-pin`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ new_pin: newPin })
+                });
+
+                if (response.ok) {
+                    alert("PIN-kod muvaffaqiyatli o'zgartirildi!");
+                    closePinModal();
+                } else {
+                    alert("Xatolik yuz berdi!");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+function showIOSToast(message, type = 'success') {
+    const toast = document.getElementById('ios-toast');
+    const msg = document.getElementById('toast-message');
+    const icon = document.getElementById('toast-icon');
+
+    msg.innerText = message;
+    
+    if (type === 'success') {
+        icon.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-white"></i>';
+        icon.className = "w-6 h-6 rounded-full flex items-center justify-center bg-green-500";
+    } else {
+        icon.innerHTML = '<i data-lucide="x" class="w-4 h-4 text-white"></i>';
+        icon.className = "w-6 h-6 rounded-full flex items-center justify-center bg-red-500";
+    }
+
+    lucide.createIcons();
+    
+    // Ko'rsatish
+    toast.classList.remove('opacity-0', '-translate-y-10');
+    toast.classList.add('opacity-100', 'translate-y-0');
+
+    // 3 soniyadan keyin yashirish
+    setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-10');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+    }, 3000);
+}
+
+async function saveNewPin() {
+    const newPin = document.getElementById('new-pin').value;
+    const confirmPin = document.getElementById('confirm-pin').value;
+
+    // 1-tekshiruv: 4 ta raqam bo'lishi shart
+    if (newPin.length < 4) {
+        showIOSToast("PIN 4 ta raqamdan kam bo'lmasligi kerak!", "error");
+        document.getElementById('new-pin').classList.add('shake'); // Boyagi shake effekti
+        setTimeout(() => document.getElementById('new-pin').classList.remove('shake'), 400);
+        return;
+    } else {
+        showIOSToast("Yangi PIN qabul qilindi", "success");
+    }
+
+    // 2-tekshiruv: Tasdiqlash solishtiruvi
+    if (newPin !== confirmPin) {
+        showIOSToast("PIN-kodlar bir xil emas!", "error");
+        return;
+    } else {
+        showIOSToast("PIN mos keldi, saqlanmoqda...", "success");
+    }
+
+    // Serverga yuborish
+    try {
+        const response = await fetch(`/api/${ADMIN_KEY}/update-pin`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ new_pin: newPin })
+        });
+
+        if (response.ok) {
+            showIOSToast("PIN muvaffaqiyatli yangilandi!", "success");
+            setTimeout(closePinModal, 1500);
+        } else {
+            showIOSToast("Serverda xatolik yuz berdi!", "error");
+        }
+    } catch (err) {
+        showIOSToast("Aloqa xatosi!", "error");
+    }
+}
+
+async function loadCookieLogs(event) {
+    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+    if(event) event.currentTarget.classList.add('active');
+
+    document.getElementById('tabTitle').innerText = "Cookie Tracking Logs";
+    document.getElementById('tabDesc').innerText = "Foydalanuvchilarning brauzer identifikatorlari va IP bog'liqligi";
+
+    const tableBody = document.getElementById('userTableBody');
+    const thead = document.querySelector('thead tr');
+
+    thead.innerHTML = `
+        <th class="p-5">Cookie ID (Fingerprint)</th>
+        <th class="p-5">Oxirgi IP Manzil</th>
+        <th class="p-5">Qurilma / Ekran</th>
+        <th class="p-5 text-right">Oxirgi faollik</th>
+    `;
+
+    tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center">Analitika yuklanmoqda...</td></tr>';
+
+    try {
+        const response = await fetch(`/api/${ADMIN_KEY}/cookie-logs`);
+        const logs = await response.json();
+        
+        tableBody.innerHTML = '';
+        logs.forEach(log => {
+            tableBody.innerHTML += `
+                <tr class="hover:bg-purple-500/5 transition border-b border-zinc-900/50">
+                    <td class="p-5">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-purple-500/10 rounded-lg">
+                                <i data-lucide="fingerprint" class="w-5 h-5 text-purple-500"></i>
+                            </div>
+                            <span class="text-white font-mono text-xs">${log.visitor_id}</span>
+                        </div>
+                    </td>
+                    <td class="p-5 text-blue-400 font-mono text-xs">${log.ip_address}</td>
+                    <td class="p-5">
+                        <div class="flex flex-col text-[10px] text-zinc-500">
+                            <span>OS: ${log.platform}</span>
+                            <span>RES: ${log.screen_res}</span>
+                        </div>
+                    </td>
+                    <td class="p-5 text-right text-zinc-400 font-mono text-[10px]">
+                        ${log.last_seen}
+                    </td>
+                </tr>`;
+        });
+        lucide.createIcons();
+    } catch (err) { console.error(err); }
+}
+
+
+ async function loadBlacklistData(event) {
+    // ... avvalgi kodlar (titles, thead o'zgartirish) ...
+    
+    // Jadval sarlavhasini kengaytiramiz
+    const thead = document.querySelector('thead tr');
+    thead.innerHTML = `
+        <th class="p-5">Hujumchi & IP</th>
+        <th class="p-5">Kiritilgan Login/Parol</th>
+        <th class="p-5">Profil Ma'lumotlari</th>
+        <th class="p-5 text-right">Vaqt (Aniqlik bilan)</th>
+    `;
+
+    try {
+        const response = await fetch(`/api/${ADMIN_KEY}/blacklist`);
+        const logs = await response.json();
+        
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = '';
+
+        logs.forEach(log => {
+            // Agar foydalanuvchi tizimda ro'yxatdan o'tgan bo'lsa (account_info bo'sh bo'lmasa)
+            let userInfoHtml = `<span class="text-zinc-500 italic text-xs">Mehmon (Ro'yxatdan o'tmagan)</span>`;
+            
+            if (log.account_info && log.account_info.reg_email) {
+                userInfoHtml = `
+                    <div class="flex flex-col gap-1">
+                        <span class="text-red-400 font-bold text-xs uppercase">⚠ Ro'yxatdan o'tgan!</span>
+                        <span class="text-white text-xs">Email: ${log.account_info.reg_email}</span>
+                        <span class="text-zinc-400 text-[10px]">User: ${log.account_info.reg_username}</span>
+                    </div>
+                `;
+            }
+
+            tableBody.innerHTML += `
+                <tr class="hover:bg-red-500/10 transition border-b border-zinc-900/50">
+                    <td class="p-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-red-900/30 flex items-center justify-center shrink-0">
+                                <i data-lucide="shield-alert" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-white font-mono text-xs">${log.ip_address}</span>
+                                <span class="text-zinc-500 text-[10px]">LOKAL XAVF</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <div class="flex flex-col">
+                            <span class="text-blue-400 text-xs">L: ${log.username_tried}</span>
+                            <span class="text-orange-400 text-xs">P: ${log.password_tried}</span>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        ${userInfoHtml}
+                    </td>
+                    <td class="p-5 text-right text-zinc-400 font-mono text-[10px]">
+                        ${log.time}
+                    </td>
+                </tr>`;
+        });
+        lucide.createIcons();
+    } catch (err) { /* ... */ }
+}
+   
+        function loadTab(tab) {
+            currentTab = tab;
+            const titles = {
+                'users': ['Foydalanuvchilar', 'Barcha ro\'yxatdan o\'tgan a\'zolar'],
+                'premium': ['Premium a\'zolar', 'Imtiyozli foydalanuvchilar ro\'yxati'],
+                'block': ['Bloklash markazi', 'Foydalanuvchilarni bloklash'],
+                'blocked_list': ['Bloklanganlar', 'Kirishi taqiqlangan foydalanuvchilar'],
+                'ip_addresses': ['IP Manzillar', 'Tizimga kirish nuqtalari'],
+                'settings': ['Sozlamalar', 'Admin panel sozlamalari']
+            };
+            document.getElementById('tabTitle').innerText = titles[tab][0];
+            document.getElementById('tabDesc').innerText = titles[tab][1];
+            
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+            if(event) event.currentTarget.classList.add('active');
+            fetchUsers();
+        }
+
+             async function fetchUsers() {
+    try {
+        let url = `/api/${ADMIN_KEY}/users`; // Default: hamma foydalanuvchilar
+        
+        // Tabga qarab URL-ni o'zgartiramiz
+        if (currentTab === 'blocked_list') {
+            url += '?type=blocked';
+        } else if (currentTab === 'premium') {
+            url += '?type=premium';
+        } else if (currentTab === 'ip_addresses') {
+            url = `/api/${ADMIN_KEY}/ip_logs`; // IP-lar uchun maxsus API
+        }
+
+        const response = await fetch(url);
+        const users = await response.json();
+        
+        const tableBody = document.getElementById('userTableBody');
+        document.getElementById('totalUsers').innerText = users.length;
+        tableBody.innerHTML = '';
+
+        // Jadval sarlavhasini (Header) o'zgartirish
+        const thead = document.querySelector('thead tr');
+        if (currentTab === 'ip_addresses') {
+            thead.innerHTML = `
+                <th class="p-5">Foydalanuvchi</th>
+                <th class="p-5">Email</th>
+                <th class="p-5">IP Manzil (Real-time)</th>
+                <th class="p-5 text-right">Amallar</th>`;
+        } else {
+            thead.innerHTML = `
+                <th class="p-5">Foydalanuvchi</th>
+                <th class="p-5">Email</th>
+                <th class="p-5">Parol</th>
+                <th class="p-5 text-right">Amallar</th>`;
+        }
+
+        if (users.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-zinc-500 italic text-sm">Ma\'lumot topilmadi...</td></tr>';
+            return;
+        }
+users.forEach(user => {
+            // 1. Belgilarni tayyorlaymiz
+  const verifiedIcon = `
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC8klEQVR4nO1ZO28TQRDeBJCCnHjXdkICpEA0dEiIf4BEAxWFeTV0UBjfzMWmtgSJkBCioUUoPBoQFTSIKlJCgf8BSCjIRUK4GScxNFjAoXU4x5gE3Wuj2LpPuubuPP6+ee3snhAJEiRI0H+46u5TQHcl0CeFtKiQ7uh7olcggR8rZLfz0vfEbsKkXds/Vl6Z6L4vkcvd5NsikMvd74+VVya0rR0jLoQ7IIFnJPC3Dc9STQE/lEi2RHqikH5tJ0A/05HQ77Z+A1T7I+yrRJ7Wto3TV0DW9gQjXhZdNy5AAi2YEiCR5o0LUMgfjEUA+L1xARJ4yVgEgJeMks8WafL/RRo1AvQzV3AOGSE/As4xifTWGHn0okAL+r9iou0OpIEvSKA5o57HrdotzaWRz0dqrRLotgGCbzJYP6uAnvmsi5lQ5FOl5QMKqRlzetRyN5wRbV+vvgrph49oNIeLjbHg3reck3F7P2PxGc++surHfQufWj0RWEC2SGkJ3IjR+0/bxivuoN+GIIEbXtSCR8HmUiwCgBydkm3vI4F/4TwlQiPv7lHI1cipA3yp7RRYPaKHN3/C+Z3mEF6AECJj1y9HTJ2XnfYU0mvfwm2+GIm8bwHA93ShSeDZLvJrevXuIH8lbOQMphA1RcXd23q/4g4q5BfeszTwNc9Uyvo8roA4YASrkVLIbxFLdE55v9H9XXcYvZJ2rqIK+XmoFLS5FIp8sDZK1Dm/jBTWcxLXjm46gs6FryEO10YDL2RAH3Wa/GMHVlXUEVyGWcj08h1ilKiOl5ZTnXYU8oMo5BXQ9+GpxmhgARve45nA3kJ65RVe2qLTUadYCXxTRDyByAcdp1tFjHxfIq9HGaclcF7EuqExuKFXm+LnY9zQ/I2sTYdNbylH8ctBYRI9vanvk2MV6vWDLSqaK2KnYFxAq7UiT3szfftwFwgl8iMfh7uz+t0tDndviR1FZXFoy9Eh4PF6StuoLA6J3YSe+MDR15+YEiRIkED4xW/llDtxm2wpZgAAAABJRU5ErkJggg==" 
+    alt="verified" class="w-[18px] h-[18px] inline-block ml-[5px] align-middle">`;
+    
+            const iosSwitch = `
+                <label class="relative inline-flex items-center cursor-pointer scale-75">
+                    <input type="checkbox" class="sr-only peer" ${user.is_verified ? 'checked' : ''} onchange="toggleVerify('${user.email}')">
+                    <div class="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                </label>
+            `;
+
+            let actionBtn = '';
+            // 2. Tugmalarni stillari bilan tabga qarab ajratamiz
+            if (currentTab === 'block') {
+                actionBtn = `<button onclick="blockUser('${user.email}')" class="px-3 py-1.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-lg hover:bg-orange-500 hover:text-white transition text-[10px] font-bold uppercase tracking-wider">Bloklash</button>`;
+            } else if (currentTab === 'blocked_list') {
+                actionBtn = `<button onclick="unblockUser('${user.email}')" class="px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg hover:bg-emerald-500 hover:text-white transition text-[10px] font-bold uppercase tracking-wider">Ochish</button>`;
+            } else if (currentTab === 'ip_addresses') {
+                actionBtn = `<span class="text-zinc-600 text-[10px] font-mono italic">AUTHORIZED</span>`;
+            } else if (currentTab === 'settings') {
+                actionBtn = iosSwitch; // Sozlamalarda faqat IOS Switch chiqadi
+            } else {
+                // Asosiy ro'yxatda o'chirish tugmasi (Trash icon)
+                actionBtn = `<button onclick="deleteUser('${user.email}')" class="p-2 text-zinc-500 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
+            }
+
+            // IP yoki Parol uchun stil
+            const infoValue = (currentTab === 'ip_addresses') ? (user.last_ip || '127.0.0.1') : user.password;
+            const infoClass = (currentTab === 'ip_addresses') ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-zinc-600 italic border-zinc-800';
+
+            // 3. HTML jadvalga chiqarish
+            tableBody.innerHTML += `
+                <tr class="hover:bg-zinc-900/40 transition group border-b border-zinc-800/50">
+                    <td class="p-5 text-white">
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white font-bold">
+                                ${user.username ? user.username[0].toUpperCase() : 'U'}
+                                ${user.is_verified ? '<div class="absolute -bottom-1 -right-1 bg-blue-600 rounded-full w-4 h-4 flex items-center justify-center text-[8px] border border-black text-white">✔</div>' : ''}
+                            </div>
+                           <div class="flex flex-col">
+    <span class="font-semibold flex items-center gap-1">
+        ${user.username || 'No Name'} 
+        ${user.is_verified ? verifiedIcon : ''} 
+    </span>
+</div>
+                        </div>
+                    </td>
+                    <td class="p-5 text-zinc-400 text-sm font-light">${user.email}</td>
+                    <td class="p-5">
+                        <span class="px-3 py-1 border rounded-lg text-[11px] font-mono ${infoClass}">
+                            ${infoValue}
+                        </span>
+                    </td>
+                    <td class="p-5 text-right">
+                        ${actionBtn}
+                    </td>
+                </tr>`;
+        });
+        lucide.createIcons();
+    } catch (err) { console.error("Xatolik:", err); }
+}
+
+        function showUIMessage(message, mode = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    
+    // Mode'ga qarab klass qo'shish
+    let colorClass = '';
+    if (mode === 'delete') colorClass = 'is-delete';
+    if (mode === 'block') colorClass = 'is-block';
+
+    toast.className = `error ${colorClass} animate-fade-in`;
+    toast.innerHTML = `
+        <div class="error__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" viewBox="0 0 24 24" height="24" fill="none"><path fill="#fff" d="m13 13h-2v-6h2zm0 4h-2v-2h2zm-1-15c-1.3132 0-2.61358.25866-3.82683.7612-1.21326.50255-2.31565 1.23915-3.24424 2.16773-1.87536 1.87537-2.92893 4.41891-2.92893 7.07107 0 2.6522 1.05357 5.1957 2.92893 7.0711.92859.9286 2.03098 1.6651 3.24424 2.1677 1.21325.5025 2.51363.7612 3.82683.7612 2.6522 0 5.1957-1.0536 7.0711-2.9289 1.8753-1.8754 2.9289-4.4189 2.9289-7.0711 0-1.3132-.2587-2.61358-.7612-3.82683-.5026-1.21326-1.2391-2.31565-2.1677-3.24424-.9286-.92858-2.031-1.66518-3.2443-2.16773-1.2132-.50254-2.5136-.7612-3.8268-.7612z"></path></svg>
+        </div>
+        <div class="error__title">${message}</div>
+        <div class="error__close" onclick="this.parentElement.remove()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 20 20" height="20"><path fill="#fff" d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"></path></svg>
+        </div>`;
+    
+    container.appendChild(toast);
+    
+    // 4 soniyadan keyin avtomatik o'chirish
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+}
+
+        function showToast(message, type = 'blue') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colors = { 'blue': 'border-blue-500', 'red': 'border-red-500', 'orange': 'border-orange-500', 'green': 'border-emerald-500' };
+            toast.className = `glass-card px-6 py-4 border-l-4 ${colors[type]} animate-fade-in shadow-2xl min-w-[300px] flex justify-between items-center pointer-events-auto`;
+            toast.innerHTML = `<span class="text-sm font-medium">${message}</span><i data-lucide="x" class="w-4 h-4 text-zinc-500 cursor-pointer" onclick="this.parentElement.remove()"></i>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => toast.remove(), 500); }, 4000);
+        }
+
+        function openModal({ title, desc, onConfirm }) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDescription').innerText = desc;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('modalConfirm').onclick = () => { onConfirm(); modal.classList.add('hidden'); modal.classList.remove('flex'); };
+            document.getElementById('modalCancel').onclick = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+        }
+
+     async function deleteUser(email) {
+    openModal({
+        title: "O'chirishni tasdiqlaysizmi?",
+        desc: `${email} o'chiriladi.`,
+        onConfirm: async () => {
+            // MANZILNI TEKSHIRING: /api/ + ADMIN_KEY + /delete_user/
+            const res = await fetch(`/api/${ADMIN_KEY}/delete_user/${email}`, { method: 'DELETE' });
+            
+            if (res.ok) { 
+                showUIMessage("Foydalanuvchi o'chirildi!", 'delete'); // Yangi message funksiyasi
+                fetchUsers(); 
+            }
+        }
+    });
+}
+async function toggleVerify(email) {
+    try {
+        const res = await fetch(`/api/${ADMIN_KEY}/toggle_verify/${email}`, { method: 'POST' });
+        if (res.ok) {
+            // Faqat jadvalni yangilaymiz, butun sahifa rasvosi chiqmaydi
+            fetchUsers(); 
+        }
+    } catch (err) {
+        console.error("Xatolik:", err);
+    }
+}
+
+        async function blockUser(email) {
+            openModal({
+                title: "Bloklashni tasdiqlaysizmi?",
+                desc: `${email} endi tizimga kira olmaydi.`,
+                onConfirm: async () => {
+                    const res = await fetch(`/api/${ADMIN_KEY}/block_user/${email}`, { method: 'POST' });
+                    if (res.ok) { showUIMessage("Foydalanuvchi muvaffaqiyatli bloklandi."); fetchUsers(); }
+                }
+            });
+        }
+
+        async function unblockUser(email) {
+            openModal({
+                title: "Blokdan chiqarilsinmi?",
+                desc: `${email} hisobidagi cheklovlar olib tashlanadi.`,
+                onConfirm: async () => {
+                    const res = await fetch(`/api/${ADMIN_KEY}/unblock_user/${email}`, { method: 'POST' });
+                    if (res.ok) { showUIMessage("Foydalanuvchi blokdan chiqarildi."); fetchUsers(); }
+                }
+            });
+        }
+
+        function showSuccessMessage(text) {
+            const container = document.getElementById('toastContainer');
+            if(!container) return;
+            const toast = document.createElement('div');
+            toast.className = `glass-card px-6 py-4 border-l-4 border-emerald-500 animate-fade-in shadow-2xl min-w-[320px] flex items-center gap-4 bg-[#050505] pointer-events-auto`;
+            toast.innerHTML = `
+                <div class="bg-emerald-500/20 p-2 rounded-lg"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-500"></i></div>
+                <div class="flex flex-col text-left">
+                    <span class="text-xs text-zinc-500 uppercase font-bold tracking-tighter">Muvaffaqiyatli</span>
+                    <span class="text-sm font-medium text-white">${text}</span>
+                </div>
+                <i data-lucide="x" class="w-4 h-4 text-zinc-600 ml-auto cursor-pointer hover:text-white" onclick="this.parentElement.remove()"></i>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => { toast.classList.add('opacity-0', 'translate-x-10'); setTimeout(() => toast.remove(), 500); }, 4000);
+        }
+
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            const colors = { 'success': 'border-emerald-500', 'error': 'border-red-500', 'warning': 'border-orange-500' };
+            toast.querySelector('.glass-card').className = `glass-card px-6 py-4 flex items-center gap-3 border-l-4 ${colors[type]} shadow-2xl`;
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        window.onload = fetchUsers;
+    </script>
+</body>
+</html>

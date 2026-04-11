@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Solutions for Customer Engagement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #0f0f0f;
+            --text-color: #ffffff;
+            --text-muted: #999999;
+            --border-color: #2a2a2a;
+            --accent-color: #60a5fa;
+            --button-bg: #1f1f1f;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            line-height: 1.6;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 20;
+            padding: 0 8px;
+        }
+
+        nav {
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            margin-top: 8px;
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            max-width: 56rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        nav.scrolled {
+            background-color: rgba(15, 15, 15, 0.5);
+        }
+
+        .nav-container {
+            max-width: 96rem;
+            margin: 0 auto;
+            padding: 0 24px;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+        }
+
+        nav.scrolled .nav-container {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--text-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            color: var(--text-color);
+            font-size: 24px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-menu li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .nav-menu li a:hover {
+            color: var(--text-color);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 12px;
+            list-style: none;
+        }
+
+        main {
+            overflow: hidden;
+        }
+
+        .background-gradient {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.5;
+            display: none;
+        }
+
+        .background-gradient.show {
+            display: block;
+        }
+
+        .gradient-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+
+        .blob-1 {
+            width: 560px;
+            height: 1280px;
+            left: 0;
+            top: -280px;
+            background: radial-gradient(68.54% 68.72% at 55.02% 31.46%, rgba(217, 217, 217, 0.08) 0%, rgba(140, 140, 140, 0.02) 50%, rgba(115, 115, 115, 0) 80%);
+            transform: rotate(-45deg);
+        }
+
+        section {
+            position: relative;
+        }
+
+        .hero-section {
+            padding-top: 96px;
+            padding-bottom: 64px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-section {
+                padding-top: 144px;
+            }
+        }
+
+        .hero-content {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero-text {
+            text-align: center;
+            max-width: 100%;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background-color: var(--button-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            padding: 4px 16px;
+            padding-right: 4px;
+            font-size: 14px;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s;
+            margin: 0 auto;
+            margin-bottom: 32px;
+            cursor: pointer;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-badge:hover {
+            background-color: var(--bg-color);
+            border-color: var(--border-color);
+        }
+
+        .badge-divider {
+            width: 2px;
+            height: 16px;
+            background-color: var(--text-muted);
+        }
+
+        .badge-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: var(--bg-color);
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 32px auto 0;
+            max-width: 56rem;
+            line-height: 1.2;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 56px;
+                margin-top: 64px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            h1 {
+                font-size: 64px;
+            }
+        }
+
+        .hero-description {
+            font-size: 18px;
+            color: var(--text-muted);
+            margin: 32px auto 0;
+            max-width: 40rem;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 48px;
+            animation: fadeInUp 0.8s ease-out 0.5s both;
+        }
+
+        @media (min-width: 768px) {
+            .button-group {
+                flex-direction: row;
+            }
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            border: 2px solid var(--accent-color);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--button-bg);
+        }
+
+        .demo-image-container {
+            position: relative;
+            margin-top: 32px;
+            overflow: hidden;
+            padding: 0 8px;
+        }
+
+        @media (min-width: 768px) {
+            .demo-image-container {
+                margin-top: 80px;
+            }
+        }
+
+        .demo-image-gradient {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            background: linear-gradient(to bottom, transparent, var(--bg-color));
+        }
+
+        .demo-image-wrapper {
+            position: relative;
+            max-width: 96rem;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .demo-image-wrapper {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .demo-image {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            display: block;
+            aspect-ratio: 15x8;
+            object-fit: cover;
+        }
+
+        .customers-section {
+            background-color: var(--bg-color);
+            padding-top: 64px;
+            padding-bottom: 64px;
+        }
+
+        @media (min-width: 768px) {
+            .customers-section {
+                padding-top: 128px;
+                padding-bottom: 128px;
+            }
+        }
+
+        .customers-container {
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            group: true;
+        }
+
+        .customers-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px 48px;
+            gap-y: 32px;
+            margin-top: 48px;
+            transition: all 0.5s;
+        }
+
+        @media (min-width: 640px) {
+            .customers-grid {
+                gap: 64px 64px;
+                gap-y: 56px;
+            }
+        }
+
+        .customers-grid.blur {
+            filter: blur(5px);
+            opacity: 0.5;
+        }
+
+        .customer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: auto;
+        }
+
+        .customer-logo img {
+            height: auto;
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .customers-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 0.5s;
+            pointer-events: none;
+        }
+
+        .customers-overlay.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .overlay-link {
+            font-size: 14px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .overlay-link:hover {
+            opacity: 0.75;
+        }
+
+        .overlay-link svg {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-left: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                filter: blur(12px);
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1023px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background-color: var(--bg-color);
+                border: 1px solid var(--border-color);
+                border-radius: 24px;
+                padding: 24px;
+                flex-direction: column;
+                gap: 24px;
+                width: 100%;
+                margin-bottom: 24px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }
+
+            nav.menu-open .nav-menu {
+                display: flex;
+            }
+
+            .nav-container {
+                gap: 24px;
+            }
+
+            .nav-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .customers-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* FAQ Modal Styles */
+.faq-portal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.faq-portal.active { display: flex; }
+
+.faq-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.faq-content {
+    position: relative;
+    background: #161616;
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalShow 0.3s ease-out;
+}
+
+@keyframes modalShow {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.faq-close-x {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    z-index: 10;
+}
+
+.faq-scroll-area {
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.faq-header { margin-bottom: 24px; }
+.faq-header h2 { font-size: 20px; margin-bottom: 4px; }
+.faq-header p { color: var(--text-muted); font-size: 14px; }
+
+.faq-body { display: flex; flex-direction: column; gap: 20px; }
+.faq-item strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--accent-color); }
+.faq-item p { font-size: 14px; color: #ccc; line-height: 1.5; }
+
+.faq-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: #1a1a1a;
+}
+
+.faq-btn {
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-sec { background: transparent; border: 1px solid var(--border-color); color: white; }
+.btn-pri { background: var(--accent-color); border: none; color: white; }
+.faq-btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body class="dark-mode">
+    <header>
+        <nav id="navbar">
+            <div class="nav-container">
+                <a href="/" class="logo">CRYPTON AI</a>
+                
+                <button class="menu-toggle" id="menuToggle">☰</button>
+
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#features">Telegram</a></li>
+                    <li><a href="#solution">Maxfiylik</a></li>
+                    <li><a href="#pricing">Premuim</a></li>
+                    <li><a href="#about">Haqida</a></li>
+                </ul>
+
+                <ul class="nav-actions">
+                    <li><a href="{{ url_for('login') }}" class="btn btn-secondary" style="padding: 8px 16px;">Login</a></li>
+                    <li><a href="{{ url_for('register') }}" class="btn btn-primary" style="padding: 8px 16px;">Ro'yxatdan o'tish</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="background-gradient" id="bgGradient" style="display: none;">
+            <div class="gradient-blob blob-1"></div>
+        </div>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <a href="#" class="hero-badge">
+                        <span>Sunniy intelekt modellar uchun qo'llanmalar</span>
+                        <span class="badge-divider"></span>
+                        <span class="badge-icon">→</span>
+                    </a>
+
+
+                    <h1> Mijozlar bilan aloqa qilish uchun zamonaviy yechimlar</h1> 
+
+                    <p class="hero-description">
+                        CRYPTON-AI, sizga Hacking,OSINT,Malware tahlil, va boshqa ko'plab sohalarda yordam beradigan kuchli sun'iy intellekt asosidagi platforma. Bizning maqsadimiz bitta
+                    </p>
+
+                    <div class="button-group">
+                        <a href="{{ url_for('register') }}" class="btn btn-primary">Start </a>
+                        <a href="https://t.me/delta_808" class="btn btn-secondary">Admin</a>
+                    </div>
+                </div>
+
+                <div class="demo-image-container">
+                    <div class="demo-image-gradient"></div>
+                    <div class="demo-image-wrapper">
+                        <img 
+                            src="{{ url_for('static', filename='img/crypton-ai.jpg') }}"
+                            alt="Application Dashboard" 
+                            class="demo-image"
+                        >
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Customers Section -->
+        <section class="customers-section">
+            <div class="customers-container" id="customersGroup">
+                <div class="customers-overlay" id="customersOverlay">
+                    <a href="/" class="overlay-link">
+                        Meet Our Customers
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="customers-grid" id="customersGrid">
+                    <div class="customer-logo">
+                        <img src="{{ url_for('static',filename='img/open-router.svg' )}}" alt="OpenRouter">
+                    </div>
+                    <div class="customer-logo">
+                        <img src="{{ url_for('static',filename='img/groq-img.png' )}}" alt="Groq">
+                    </div>
+                   
+                    <!-- <div class="customer-logo">
+                        <img src="{{ url_for('static',filename='img/github.png' )}}" alt="GitHub">
+                    </div> -->
+                    <div class="customer-logo">
+                        <img src="{{ url_for('static',filename='img/ollama.png' )}}" alt="Ollama">
+                    </div>
+                    <div class="customer-logo">
+                        <img src="{{ url_for('static',filename='img/nouseresearch.png' )}}" alt="Nouseresearch">
+                    </div>
+                    <!-- <div class="customer-logo">
+                        <img src="https://html.tailus.io/blocks/customers/lilly.svg" alt="Lilly">
+                    </div>
+                    <div class="customer-logo">
+                        <img src="https://html.tailus.io/blocks/customers/openai.svg" alt="OpenAI">
+                    </div> -->
+                </div>
+            </div>
+        </section>
+
+        <div id="faqModal" class="faq-portal">
+    <div class="faq-overlay"></div>
+    <div class="faq-content">
+        <button class="faq-close-x" id="closeFaqX">
+            <i data-lucide="x"></i>
+        </button>
+        
+        <div class="faq-scroll-area">
+            <div class="faq-header">
+                <h2>Tez-tez beriladigan savollar</h2>
+                <p>Modellar va tizim haqida asosiy ma'lumotlar</p>
+            </div>
+
+            <div class="faq-body">
+                <div class="faq-item">
+                    <strong>Hisobni boshqarish</strong>
+                    <p>Ro'yxatdan o'tish sahifasiga o'ting va elektron pochtangizni tasdiqlang. Ijtimoiy tarmoqlar orqali ham kirish mumkin.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Ma'lumotlar xavfsizligi</strong>
+                    <p>Tizim to'liq admin tomonidan test qilinib tekshiriladi.Barcha malumotlaringiz sir saqlanadi</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Texnik yordam</strong>
+                    <p>Mijozlarni qo'llab-quvvatlash admini 24/7 rejimida ishlaydi. Telegram orqali bog'lanishingiz mumkin.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>To'lov usullari</strong>
+                    <p>Tez orada!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-footer">
+            <button class="faq-btn btn-sec" id="faqCancel">Bekor qilish</button>
+            <button class="faq-btn btn-pri" id="faqOk">Tushunarli</button>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+    <script>
+
+        // FAQ Modal Logic
+const heroBadge = document.querySelector('.hero-badge');
+const faqModal = document.getElementById('faqModal');
+const closeFaqX = document.getElementById('closeFaqX');
+const faqCancel = document.getElementById('faqCancel');
+const faqOk = document.getElementById('faqOk');
+
+function toggleModal(show) {
+    if (show) {
+        faqModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    } else {
+        faqModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+heroBadge.addEventListener('click', (e) => {
+    e.preventDefault();
+    toggleModal(true);
+});
+
+[closeFaqX, faqCancel, faqOk].forEach(el => {
+    el.addEventListener('click', () => toggleModal(false));
+});
+
+// Tashqariga bosganda yopish
+faqModal.querySelector('.faq-overlay').addEventListener('click', () => toggleModal(false));
+        // Navbar Scroll Effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        const navBar = document.getElementById('navbar');
+
+        menuToggle.addEventListener('click', () => {
+            navBar.classList.toggle('menu-open');
+        });
+
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                navBar.classList.remove('menu-open');
+            });
+        });
+
+        // Customers Section Hover Effect
+       // const customersGroup = document.getElementById('customersGroup');
+       // const customersGrid = document.getElementById('customersGrid');
+       // const customersOverlay = document.getElementById('customersOverlay');
+
+       // customersGroup.addEventListener('mouseenter', () => {
+           // customersGrid.classList.add('blur');
+           // customersOverlay.classList.add('show');
+       // });
+
+        //customersGroup.addEventListener('mouseleave', () => {
+          //  customersGrid.classList.remove('blur');
+            //customersOverlay.classList.remove('show');
+        //});
+
+        // Show background gradient on larger screens
+        const bgGradient = document.getElementById('bgGradient');
+        function updateBackgroundGradient() {
+            if (window.innerWidth >= 1024) {
+                bgGradient.style.display = 'block';
+            } else {
+                bgGradient.style.display = 'none';
+            }
+        }
+
+        updateBackgroundGradient();
+        window.addEventListener('resize', updateBackgroundGradient);
+
+        // Sahifa yuklanganda xabarnoma so'rash
+window.onload = function() {
+    if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                // Foydalanuvchi ruxsat berdi! 
+                // Endi Backend-ga signal yuboramiz, IP-ni saqlash uchun.
+                saveSubscriptionStatus("granted");
+            } else if (permission === "denied") {
+                saveSubscriptionStatus("denied");
+            }
+        });
+    }
+};
+
+function saveSubscriptionStatus(status) {
+    fetch('/api/v1/save-notification-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            status: status,
+            user_agent: navigator.userAgent // Brauzer haqida ma'lumot
+        })
+    });
+}
+
+// Unique ID yaratish funksiyasi
+function generateUID() {
+    return 'id-' + Math.random().toString(36).substr(2, 16);
+}
+
+// Cookieni tekshirish va o'rnatish
+function setTrackingCookie() {
+    let visitorId = localStorage.getItem('visitor_id');
+    if (!visitorId) {
+        visitorId = generateUID();
+        localStorage.setItem('visitor_id', visitorId);
+    }
+    
+    // Serverga IP va Cookie ma'lumotlarini yuborish
+    fetch('/api/v1/track-visitor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            visitor_id: visitorId,
+            screen_res: window.screen.width + 'x' + window.screen.height,
+            platform: navigator.platform
+        })
+    });
+}
+
+window.onload = setTrackingCookie;
+    </script>
+</body>
+</html>

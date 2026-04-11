@@ -1,0 +1,94 @@
+:root {
+    --bg-color: #0d1117;
+    --sidebar-color: #010409;
+    --input-bg: #161b22;
+    --text-color: #e6edf3;
+    --accent-color: #238636; /* Yashilroq, Grok kabi */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+}
+
+.app-container { display: flex; width: 100%; }
+
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-color);
+    padding: 20px;
+    border-right: 1px solid #30363d;
+}
+
+.chat-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#chat-window {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 40px 20% 100px 20%;
+}
+
+.input-container {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+}
+
+.input-wrapper {
+    background: var(--input-bg);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+}
+
+textarea {
+    background: transparent;
+    border: none;
+    color: white;
+    flex-grow: 1;
+    resize: none;
+    outline: none;
+    font-size: 16px;
+    padding: 5px;
+}
+
+#send-btn {
+    background: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+#generating-status {
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.chat-btn{
+    background-color: #010409;
+    color: white;
+}
+.hidden { display: none; }
+
+/* Chat xabarlari uslubi */
+.message { margin-bottom: 25px; line-height: 1.6; }
+.user-msg { font-weight: 600; color: #58a6ff; }
+.ai-msg { background: #161b22; padding: 15px; border-radius: 10px; }
