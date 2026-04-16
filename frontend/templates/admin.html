@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypton AI - Admin Control</title>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath %7B fill: %23333; %7D @media (prefers-color-scheme: dark) %7B path %7B fill: white; %7D %7D%3C/style%3E%3Cg clip-path='url(%23clip0_4418_8984)'%3E%3Cpath d='M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z'/%3E%3Cpath d='M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_4418_8984'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -60,6 +62,18 @@
 .error__title { font-weight: 500; font-size: 14px; color: #fff; }
 .error__close { width: 20px; height: 20px; cursor: pointer; margin-left: auto; }
 .error__close path { fill: #fff; }
+
+
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    display: inline-block; /* Muhim! */
+    animation: spin 1s linear infinite;
+}
     </style>
 </head>
 <body class="flex">
@@ -106,9 +120,9 @@
                     <span class="text-zinc-500 text-xs uppercase font-bold tracking-widest">Jami:</span>
                     <span id="totalUsers" class="text-blue-500 font-bold">0</span>
                 </div>
-                <button onclick="fetchUsers()" class="p-3 glass-card hover:bg-zinc-900 transition text-zinc-400 border-zinc-800">
-                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
-                </button>
+             <button onclick="fetchUsers(event)" class="p-3 glass-card hover:bg-zinc-900 transition text-zinc-400 border-zinc-800">
+    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+</button>
             </div>
         </header>
 
@@ -436,17 +450,26 @@ async function loadCookieLogs(event) {
             fetchUsers();
         }
 
-             async function fetchUsers() {
+async function fetchUsers(event) {
+    // --- REFRESH EFFEKTI BOSHLANISHI ---
+    const refreshBtn = event ? event.currentTarget : null;
+    const icon = refreshBtn ? refreshBtn.querySelector('i') : null;
+
+    if (icon) {
+        icon.classList.add('animate-spin'); // Ikonkani aylantirish
+        refreshBtn.classList.add('opacity-50', 'pointer-events-none'); // Tugmani muzlatish
+    }
+    // -----------------------------------
+
     try {
-        let url = `/api/${ADMIN_KEY}/users`; // Default: hamma foydalanuvchilar
+        let url = `/api/${ADMIN_KEY}/users`; 
         
-        // Tabga qarab URL-ni o'zgartiramiz
         if (currentTab === 'blocked_list') {
             url += '?type=blocked';
         } else if (currentTab === 'premium') {
             url += '?type=premium';
         } else if (currentTab === 'ip_addresses') {
-            url = `/api/${ADMIN_KEY}/ip_logs`; // IP-lar uchun maxsus API
+            url = `/api/${ADMIN_KEY}/ip_logs`; 
         }
 
         const response = await fetch(url);
@@ -456,41 +479,23 @@ async function loadCookieLogs(event) {
         document.getElementById('totalUsers').innerText = users.length;
         tableBody.innerHTML = '';
 
-        // Jadval sarlavhasini (Header) o'zgartirish
         const thead = document.querySelector('thead tr');
         if (currentTab === 'ip_addresses') {
-            thead.innerHTML = `
-                <th class="p-5">Foydalanuvchi</th>
-                <th class="p-5">Email</th>
-                <th class="p-5">IP Manzil (Real-time)</th>
-                <th class="p-5 text-right">Amallar</th>`;
+            thead.innerHTML = `<th class="p-5">Foydalanuvchi</th><th class="p-5">Email</th><th class="p-5">IP Manzil (Real-time)</th><th class="p-5 text-right">Amallar</th>`;
         } else {
-            thead.innerHTML = `
-                <th class="p-5">Foydalanuvchi</th>
-                <th class="p-5">Email</th>
-                <th class="p-5">Parol</th>
-                <th class="p-5 text-right">Amallar</th>`;
+            thead.innerHTML = `<th class="p-5">Foydalanuvchi</th><th class="p-5">Email</th><th class="p-5">Parol</th><th class="p-5 text-right">Amallar</th>`;
         }
 
         if (users.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-zinc-500 italic text-sm">Ma\'lumot topilmadi...</td></tr>';
             return;
         }
-users.forEach(user => {
-            // 1. Belgilarni tayyorlaymiz
-  const verifiedIcon = `
-    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC8klEQVR4nO1ZO28TQRDeBJCCnHjXdkICpEA0dEiIf4BEAxWFeTV0UBjfzMWmtgSJkBCioUUoPBoQFTSIKlJCgf8BSCjIRUK4GScxNFjAoXU4x5gE3Wuj2LpPuubuPP6+ee3snhAJEiRI0H+46u5TQHcl0CeFtKiQ7uh7olcggR8rZLfz0vfEbsKkXds/Vl6Z6L4vkcvd5NsikMvd74+VVya0rR0jLoQ7IIFnJPC3Dc9STQE/lEi2RHqikH5tJ0A/05HQ77Z+A1T7I+yrRJ7Wto3TV0DW9gQjXhZdNy5AAi2YEiCR5o0LUMgfjEUA+L1xARJ4yVgEgJeMks8WafL/RRo1AvQzV3AOGSE/As4xifTWGHn0okAL+r9iou0OpIEvSKA5o57HrdotzaWRz0dqrRLotgGCbzJYP6uAnvmsi5lQ5FOl5QMKqRlzetRyN5wRbV+vvgrph49oNIeLjbHg3reck3F7P2PxGc++surHfQufWj0RWEC2SGkJ3IjR+0/bxivuoN+GIIEbXtSCR8HmUiwCgBydkm3vI4F/4TwlQiPv7lHI1cipA3yp7RRYPaKHN3/C+Z3mEF6AECJj1y9HTJ2XnfYU0mvfwm2+GIm8bwHA93ShSeDZLvJrevXuIH8lbOQMphA1RcXd23q/4g4q5BfeszTwNc9Uyvo8roA4YASrkVLIbxFLdE55v9H9XXcYvZJ2rqIK+XmoFLS5FIp8sDZK1Dm/jBTWcxLXjm46gs6FryEO10YDL2RAH3Wa/GMHVlXUEVyGWcj08h1ilKiOl5ZTnXYU8oMo5BXQ9+GpxmhgARve45nA3kJ65RVe2qLTUadYCXxTRDyByAcdp1tFjHxfIq9HGaclcF7EuqExuKFXm+LnY9zQ/I2sTYdNbylH8ctBYRI9vanvk2MV6vWDLSqaK2KnYFxAq7UiT3szfftwFwgl8iMfh7uz+t0tDndviR1FZXFoy9Eh4PF6StuoLA6J3YSe+MDR15+YEiRIkED4xW/llDtxm2wpZgAAAABJRU5ErkJggg==" 
-    alt="verified" class="w-[18px] h-[18px] inline-block ml-[5px] align-middle">`;
-    
-            const iosSwitch = `
-                <label class="relative inline-flex items-center cursor-pointer scale-75">
-                    <input type="checkbox" class="sr-only peer" ${user.is_verified ? 'checked' : ''} onchange="toggleVerify('${user.email}')">
-                    <div class="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                </label>
-            `;
+
+        users.forEach(user => {
+            const verifiedIcon = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC8klEQVR4nO1ZO28TQRDeBJCCnHjXdkICpEA0dEiIf4BEAxWFeTV0UBjfzMWmtgSJkBCioUUoPBoQFTSIKlJCgf8BSCjIRUK4GScxNFjAoXU4x5gE3Wuj2LpPuubuPP6+ee3snhAJEiRI0H+46u5TQHcl0CeFtKiQ7uh7olcggR8rZLfz0vfEbsKkXds/Vl6Z6L4vkcvd5NsikMvd74+VVya0rR0jLoQ7IIFnJPC3Dc9STQE/lEi2RHqikH5tJ0A/05HQ77Z+A1T7I+yrRJ7Wto3TV0DW9gQjXhZdNy5AAi2YEiCR5o0LUMgfjEUA+L1xARJ4yVgEgJeMks8WafL/RRo1AvQzV3AOGSE/As4xifTWGHn0okAL+r9iou0OpIEvSKA5o57HrdotzaWRz0dqrRLotgGCbzJYP6uAnvmsi5lQ5FOl5QMKqRlzetRyN5wRbV+vvgrph49oNIeLjbHg3reck3F7P2PxGc++surHfQufWj0RWEC2SGkJ3IjR+0/bxivuoN+GIIEbXtSCR8HmUiwCgBydkm3vI4F/4TwlQiPv7lHI1cipA3yp7RRYPaKHN3/C+Z3mEF6AECJj1y9HTJ2XnfYU0mvfwm2+GIm8bwHA93ShSeDZLvJrevXuIH8lbOQMphA1RcXd23q/4g4q5BfeszTwNc9Uyvo8roA4YASrkVLIbxFLdE55v9H9XXcYvZJ2rqIK+XmoFLS5FIp8sDZK1Dm/jBTWcxLXjm46gs6FryEO10YDL2RAH3Wa/GMHVlXUEVyGWcj08h1ilKiOl5ZTnXYU8oMo5BXQ9+GpxmhgARve45nA3kJ65RVe2qLTUadYCXxTRDyByAcdp1tFjHxfIq9HGaclcF7EuqExuKFXm+LnY9zQ/I2sTYdNbylH8ctBYRI9vanvk2MV6vWDLSqaK2KnYFxAq7UiT3szfftwFwgl8iMfh7uz+t0tDndviR1FZXFoy9Eh4PF6StuoLA6J3YSe+MDR15+YEiRIkED4xW/llDtxm2wpZgAAAABJRU5ErkJggg==" alt="verified" class="w-[18px] h-[18px] inline-block ml-[5px] align-middle">`;
+            const iosSwitch = `<label class="relative inline-flex items-center cursor-pointer scale-75"><input type="checkbox" class="sr-only peer" ${user.is_verified ? 'checked' : ''} onchange="toggleVerify('${user.email}')"><div class="w-11 h-6 bg-zinc-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label>`;
 
             let actionBtn = '';
-            // 2. Tugmalarni stillari bilan tabga qarab ajratamiz
             if (currentTab === 'block') {
                 actionBtn = `<button onclick="blockUser('${user.email}')" class="px-3 py-1.5 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-lg hover:bg-orange-500 hover:text-white transition text-[10px] font-bold uppercase tracking-wider">Bloklash</button>`;
             } else if (currentTab === 'blocked_list') {
@@ -498,17 +503,14 @@ users.forEach(user => {
             } else if (currentTab === 'ip_addresses') {
                 actionBtn = `<span class="text-zinc-600 text-[10px] font-mono italic">AUTHORIZED</span>`;
             } else if (currentTab === 'settings') {
-                actionBtn = iosSwitch; // Sozlamalarda faqat IOS Switch chiqadi
+                actionBtn = iosSwitch;
             } else {
-                // Asosiy ro'yxatda o'chirish tugmasi (Trash icon)
                 actionBtn = `<button onclick="deleteUser('${user.email}')" class="p-2 text-zinc-500 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
             }
 
-            // IP yoki Parol uchun stil
             const infoValue = (currentTab === 'ip_addresses') ? (user.last_ip || '127.0.0.1') : user.password;
             const infoClass = (currentTab === 'ip_addresses') ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : 'text-zinc-600 italic border-zinc-800';
 
-            // 3. HTML jadvalga chiqarish
             tableBody.innerHTML += `
                 <tr class="hover:bg-zinc-900/40 transition group border-b border-zinc-800/50">
                     <td class="p-5 text-white">
@@ -517,29 +519,31 @@ users.forEach(user => {
                                 ${user.username ? user.username[0].toUpperCase() : 'U'}
                                 ${user.is_verified ? '<div class="absolute -bottom-1 -right-1 bg-blue-600 rounded-full w-4 h-4 flex items-center justify-center text-[8px] border border-black text-white">✔</div>' : ''}
                             </div>
-                           <div class="flex flex-col">
-    <span class="font-semibold flex items-center gap-1">
-        ${user.username || 'No Name'} 
-        ${user.is_verified ? verifiedIcon : ''} 
-    </span>
-</div>
+                           <div class="flex flex-col"><span class="font-semibold flex items-center gap-1">${user.username || 'No Name'} ${user.is_verified ? verifiedIcon : ''}</span></div>
                         </div>
                     </td>
                     <td class="p-5 text-zinc-400 text-sm font-light">${user.email}</td>
-                    <td class="p-5">
-                        <span class="px-3 py-1 border rounded-lg text-[11px] font-mono ${infoClass}">
-                            ${infoValue}
-                        </span>
-                    </td>
-                    <td class="p-5 text-right">
-                        ${actionBtn}
-                    </td>
+                    <td class="p-5"><span class="px-3 py-1 border rounded-lg text-[11px] font-mono ${infoClass}">${infoValue}</span></td>
+                    <td class="p-5 text-right">${actionBtn}</td>
                 </tr>`;
         });
         lucide.createIcons();
-    } catch (err) { console.error("Xatolik:", err); }
-}
 
+    } catch (err) { 
+        console.error("Xatolik:", err); 
+    } finally {
+        // --- REFRESH EFFEKTINI TO'XTATISH ---
+      setTimeout(() => {
+            if (refreshBtn) {
+                // Yangilangan SVG ikonkani qayta topamiz (chunki lucide.createIcons uni yangiladi)
+                const newIcon = refreshBtn.querySelector('i, svg');
+                if (newIcon) newIcon.classList.remove('animate-spin');
+                refreshBtn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        }, 1000);
+        // ------------------------------------
+    }
+}
         function showUIMessage(message, mode = 'success') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath %7B fill: %23333; %7D @media (prefers-color-scheme: dark) %7B path %7B fill: white; %7D %7D%3C/style%3E%3Cg clip-path='url(%23clip0_4418_8984)'%3E%3Cpath d='M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z'/%3E%3Cpath d='M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_4418_8984'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E">
+
+    <title>Maxfiylik Siyosati - Crypton AI</title>
+    <link rel="stylesheet" href="privacy_style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+    --bg: #09090b;
+    --fg: #fafafa;
+    --border: #27272a;
+    --muted: #a1a1aa;
+    --accent: #3b82f6; /* Moviy xavfsizlik rangi */
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.privacy-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+.privacy-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.text-muted {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.accordion {
+    border-top: 1px solid var(--border);
+}
+
+.accordion-item {
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.accordion-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    color: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.02);
+}
+
+.text-wrapper {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.item-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.item-sub {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.chevron {
+    transition: transform 0.2s ease;
+    color: var(--muted);
+}
+
+/* Accordion Animatsiyasi */
+.accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.25s ease-out;
+    overflow: hidden;
+}
+
+.content-inner {
+    min-height: 0;
+    padding-left: 60px;
+    padding-bottom: 20px;
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+}
+
+.accordion-item.open .accordion-content {
+    grid-template-rows: 1fr;
+}
+
+.accordion-item.open .chevron {
+    transform: rotate(180deg);
+    color: var(--accent);
+}
+
+.accordion-item.open .icon-wrapper {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+    </style>
+</head>
+<body>
+
+<div class="privacy-container">
+    <header class="privacy-header">
+        <h1 class="text-2xl font-bold">Maxfiylik va AI Xavfsizligi</h1>
+        <p class="text-muted">Oxirgi yangilanish: 14-Aprel, 2026-yil</p>
+    </header>
+   <p>Sizning barcha ma'lumotlaringiz sir saqlanadi.</p>
+</div>
+
+<script src="privacy_script.js">
+    document.addEventListener('DOMContentLoaded', () => {
+    // Lucide ikonkalarni generatsiya qilish
+    lucide.createIcons();
+
+    const items = document.querySelectorAll('.accordion-item');
+
+    items.forEach(item => {
+        const trigger = item.querySelector('.accordion-trigger');
+        
+        trigger.addEventListener('click', () => {
+            const isOpen = item.classList.contains('open');
+
+            // Boshqa barcha ochiq bo'limlarni yopish (optional - agar xohlasang)
+            items.forEach(i => i.classList.remove('open'));
+
+            // Agar yopiq bo'lgan bo'lsa, ochamiz
+            if (!isOpen) {
+                item.classList.add('open');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

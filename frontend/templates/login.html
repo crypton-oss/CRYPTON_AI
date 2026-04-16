@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath %7B fill: %23333; %7D @media (prefers-color-scheme: dark) %7B path %7B fill: white; %7D %7D%3C/style%3E%3Cg clip-path='url(%23clip0_4418_8984)'%3E%3Cpath d='M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z'/%3E%3Cpath d='M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_4418_8984'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E">
+
     <title>Crypton AI - Dark Sign In</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -26,6 +28,31 @@
             border-color: #3b82f6 !important;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
+
+        #blockModal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: none; /* Dastlab yashirin */
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+#blockModal:not(.hidden) {
+    display: flex; /* hidden klassi olib tashlanganda ko'rinadi */
+}
+
+/* Modal ichidagi oyna stili */
+#blockModal > div {
+    background: #09090b;
+    border: 1px solid #450a0a;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+}
     </style>
 </head>
 <body class="font-sans min-h-screen flex items-center justify-center p-4">
@@ -113,77 +140,133 @@
         </div>
     </div>
 
+
+    <div id="blockModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border border-red-900/50 w-full max-w-sm rounded-2xl p-6 shadow-2xl shadow-red-900/20">
+        <div class="flex flex-col items-center text-center">
+            <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
+                <i data-lucide="shield-alert" class="text-red-500 w-8 h-8"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-white mb-2">Akkaunt bloklandi!</h3>
+            <p class="text-zinc-400 text-sm mb-4">
+                Xavfsizlik qoidalarini buzganingiz uchun tizimga kirishingiz cheklandi.
+            </p>
+            
+            <div class="bg-zinc-900/50 rounded-lg p-3 w-full mb-6 border border-zinc-800">
+                <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Bloklangan vaqt:</span>
+                <p id="blockedTime" class="text-red-400 font-mono text-sm mt-1"></p>
+            </div>
+
+            <div class="flex gap-3 w-full">
+                <a href="https://t.me/delta_808" target="_blank" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-center transition"></a>
+                    Yordam
+                </a>
+                <button onclick="closeBlockModal()" class="flex-1 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-semibold transition">
+                    Tushunarli
+                </button>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
  <script>
+  lucide.createIcons();
+
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const signInBtn = document.getElementById('signInBtn');
+const errorMessage = document.getElementById('errorMessage');
+const togglePassword = document.getElementById('togglePassword');
+const blockModal = document.getElementById('blockModal'); // Modalni chaqiramiz
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Parolni ko'rsatish/yashirish
+togglePassword.addEventListener('click', () => {
+    const type = passwordInput.type === 'password' ? 'text' : 'password';
+    passwordInput.type = type;
+    const iconName = type === 'password' ? 'eye' : 'eye-off';
+    togglePassword.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
     lucide.createIcons();
+});
 
-    const emailInput = document.getElementById('emailInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const signInBtn = document.getElementById('signInBtn');
-    const errorMessage = document.getElementById('errorMessage');
-    const togglePassword = document.getElementById('togglePassword');
+// ASOSIY LOGIN FUNKSIYASI
+signInBtn.addEventListener('click', async (event) => {
+    event.preventDefault(); // Sahifa yangilanib ketmasligi uchun
 
-    function validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // 1. Validatsiya
+    if (!email || !password) {
+        showError("Iltimos, email va parolni to'liq kiriting.");
+        return;
+    }
+    if (!validateEmail(email)) {
+        showError("Email formati noto'g'ri.");
+        return;
     }
 
-    togglePassword.addEventListener('click', () => {
-        const type = passwordInput.type === 'password' ? 'text' : 'password';
-        passwordInput.type = type;
-        const iconName = type === 'password' ? 'eye' : 'eye-off';
-        togglePassword.innerHTML = `<i data-lucide="${iconName}" class="w-5 h-5"></i>`;
-        lucide.createIcons();
-    });
+    // Tugmani vaqtinchalik o'chirish
+    signInBtn.disabled = true;
+    signInBtn.innerText = "Checking...";
+    signInBtn.classList.add('opacity-50');
+    errorMessage.classList.add('hidden'); // Avvalgi xatolarni yashirish
 
-    signInBtn.addEventListener('click', async () => {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
 
-        if (!email || !password) {
-            showError("Iltimos, email va parolni to'liq kiriting.");
+        const result = await response.json();
+
+        // 2. BLOKLANGAN HOLATNI TEKSHIRISH (403 xatosi)
+        if (response.status === 403 || result.status === 'blocked') {
+            document.getElementById('blockedTime').innerText = result.blocked_at || "Nomalum";
+            blockModal.classList.remove('hidden');
+            blockModal.style.display = 'flex'; // Agar hidden klassi ishlamasa kafolat
+            lucide.createIcons();
+            resetButton();
             return;
         }
-        if (!validateEmail(email)) {
-            showError("Email formati noto'g'ri.");
-            return;
-        }
 
-        signInBtn.disabled = true;
-        signInBtn.innerText = "Checking...";
-        signInBtn.classList.add('opacity-50');
-
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                window.location.href = result.redirect;
-            } else {
-                showError(result.message);
-                resetButton();
-            }
-        } catch (error) {
-            showError("Server bilan aloqa uzildi.");
+        // 3. MUVAFFIQIYATLI LOGIN
+        if (result.success) {
+            window.location.href = result.redirect;
+        } else {
+            showError(result.message || "Email yoki parol xato!");
             resetButton();
         }
-    });
 
-    function resetButton() {
-        signInBtn.disabled = false;
-        signInBtn.innerText = "Login";
-        signInBtn.classList.remove('opacity-50');
+    } catch (error) {
+        showError("Server bilan aloqa uzildi.");
+        console.error("Login xatosi:", error);
+        resetButton();
     }
+});
 
-    function showError(text) {
-        errorMessage.textContent = text;
-        errorMessage.classList.remove('hidden');
-        errorMessage.classList.add('animate-pulse');
-        setTimeout(() => errorMessage.classList.remove('animate-pulse'), 1000);
-    }
+function resetButton() {
+    signInBtn.disabled = false;
+    signInBtn.innerText = "Login";
+    signInBtn.classList.remove('opacity-50');
+}
+
+function showError(text) {
+    errorMessage.textContent = text;
+    errorMessage.classList.remove('hidden');
+}
+
+// Modalni yopish funksiyasi
+function closeBlockModal() {
+    blockModal.classList.add('hidden');
+    blockModal.style.display = 'none';
+}
 </script>
 </body>
 </html>

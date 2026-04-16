@@ -2,8 +2,10 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>Crypton AI - Professional Chat</title>
+    <!-- <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cg clip-path='url(%23clip0_4418_8984)'%3E%3Cpath d='M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z' fill='white'/%3E%3Cpath d='M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z' fill='white'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_4418_8984'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E"> -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cstyle%3Epath %7B fill: %23333; %7D @media (prefers-color-scheme: dark) %7B path %7B fill: white; %7D %7D%3C/style%3E%3Cg clip-path='url(%23clip0_4418_8984)'%3E%3Cpath d='M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z'/%3E%3Cpath d='M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_4418_8984'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -152,9 +154,21 @@
     </style>
 </head>
 <body class="flex h-screen w-full">
+<div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden"></div>
 
- <div class="hidden md:flex flex-col w-80 border-r border-[#27272a] p-4 h-screen shrink-0 bg-[#09090b]">
-    
+<button onclick="toggleSidebar()" class="md:hidden fixed top-[10px] left-4 z-30 p-2 bg-zinc-900 border border-white/10 rounded-lg text-white">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"></path></svg>
+</button>
+
+<div id="sidebar" class="fixed md:relative inset-y-0 left-0 z-50 flex flex-col w-80 border-r border-[#27272a] p-4 h-screen shrink-0 bg-[#09090b] transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        
+<button onclick="toggleSidebar()" class="md:hidden absolute right-4 top-4 mt-[5px] ml-[20px] p-2 text-zinc-500 hover:text-white transition-colors">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+</button>
+
    <button onclick="startNewChat()" id="new-chat-btn" class="flex items-center justify-center gap-2 w-full py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition shrink-0 shadow-sm active:scale-[0.98]">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -163,15 +177,12 @@
     Yangi chat
 </button>
 
-<div class="mt-6 flex-1 overflow-y-auto px-2">
+<div class="mt-6 flex-1 overflow-y-auto px-2" >
     <div class="text-[10px] font-bold text-zinc-500 mb-4 px-3 uppercase tracking-widest">Suhbatlar tarixi</div>
     <div id="chat-history-list" class="space-y-1">
         </div>
 </div>
-<!-- 
-    <div class="flex-1 overflow-y-auto space-y-2 mt-6 pr-2 custom-scrollbar" id="chat-history-list">
-        <p class="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.15em] px-2 mb-2">Tarix</p>
-    </div> -->
+
 
     <div class="mt-auto pt-4 relative">
         <div class="border-t border-[#27272a] pt-4 px-1">
@@ -189,40 +200,41 @@
                 </div>
 
                 <div class="p-2 space-y-1">
-                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
-                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
-<g clip-path="url(#clip0_3111_32730)">
-<path d="M12 2C9.38 2 7.25 4.13 7.25 6.75C7.25 9.32 9.26 11.4 11.88 11.49C11.96 11.48 12.04 11.48 12.1 11.49C12.12 11.49 12.13 11.49 12.15 11.49C12.16 11.49 12.16 11.49 12.17 11.49C14.73 11.4 16.74 9.32 16.75 6.75C16.75 4.13 14.62 2 12 2Z" fill="white" style="fill: var(--fillg);"/>
-<path d="M17.08 14.1499C14.29 12.2899 9.73996 12.2899 6.92996 14.1499C5.65996 14.9999 4.95996 16.1499 4.95996 17.3799C4.95996 18.6099 5.65996 19.7499 6.91996 20.5899C8.31996 21.5299 10.16 21.9999 12 21.9999C13.84 21.9999 15.68 21.5299 17.08 20.5899C18.34 19.7399 19.04 18.5999 19.04 17.3599C19.03 16.1299 18.34 14.9899 17.08 14.1499Z" fill="white" style="fill: var(--fillg);"/>
-</g>
-<defs>
-<clipPath id="clip0_3111_32730">
-<rect width="24" height="24" fill="white"/>
-</clipPath>
-</defs>
-</svg>
-                        </div>
-                        <span class="font-medium">Profile</span>
-                    </button>
+<button onclick="window.location.href='/profile'" class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all cursor-pointer">
+    <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
+            <g clip-path="url(#clip0_3111_32730)">
+                <path d="M12 2C9.38 2 7.25 4.13 7.25 6.75C7.25 9.32 9.26 11.4 11.88 11.49C11.96 11.48 12.04 11.48 12.1 11.49C12.12 11.49 12.13 11.49 12.15 11.49C12.16 11.49 12.16 11.49 12.17 11.49C14.73 11.4 16.74 9.32 16.75 6.75C16.75 4.13 14.62 2 12 2Z" fill="white" style="fill: var(--fillg);"/>
+                <path d="M17.08 14.1499C14.29 12.2899 9.73996 12.2899 6.92996 14.1499C5.65996 14.9999 4.95996 16.1499 4.95996 17.3799C4.95996 18.6099 5.65996 19.7499 6.91996 20.5899C8.31996 21.5299 10.16 21.9999 12 21.9999C13.84 21.9999 15.68 21.5299 17.08 20.5899C18.34 19.7399 19.04 18.5999 19.04 17.3599C19.03 16.1299 18.34 14.9899 17.08 14.1499Z" fill="white" style="fill: var(--fillg);"/>
+            </g>
+            <defs>
+                <clipPath id="clip0_3111_32730">
+                    <rect width="24" height="24" fill="white"/>
+                </clipPath>
+            </defs>
+        </svg>
+    </div>
+    <span class="font-medium transition">
+        Profile
+    </span>
+</button>
 
-                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
-                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-<g clip-path="url(#clip0_4418_9935)">
-<path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
-<path d="M2 12.8794V11.1194C2 10.0794 2.85 9.21945 3.9 9.21945C5.71 9.21945 6.45 7.93945 5.54 6.36945C5.02 5.46945 5.33 4.29945 6.24 3.77945L7.97 2.78945C8.76 2.31945 9.78 2.59945 10.25 3.38945L10.36 3.57945C11.26 5.14945 12.74 5.14945 13.65 3.57945L13.76 3.38945C14.23 2.59945 15.25 2.31945 16.04 2.78945L17.77 3.77945C18.68 4.29945 18.99 5.46945 18.47 6.36945C17.56 7.93945 18.3 9.21945 20.11 9.21945C21.15 9.21945 22.01 10.0694 22.01 11.1194V12.8794C22.01 13.9194 21.16 14.7794 20.11 14.7794C18.3 14.7794 17.56 16.0594 18.47 17.6294C18.99 18.5394 18.68 19.6994 17.77 20.2194L16.04 21.2094C15.25 21.6794 14.23 21.3994 13.76 20.6094L13.65 20.4194C12.75 18.8494 11.27 18.8494 10.36 20.4194L10.25 20.6094C9.78 21.3994 8.76 21.6794 7.97 21.2094L6.24 20.2194C5.33 19.6994 5.02 18.5294 5.54 17.6294C6.45 16.0594 5.71 14.7794 3.9 14.7794C2.85 14.7794 2 13.9194 2 12.8794Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
-</g>
-<defs>
-<clipPath id="clip0_4418_9935">
-<rect width="24" height="24" fill="white"/>
-</clipPath>
-</defs>
-</svg>
-                        </div>
-                        <span class="font-medium">Settings</span>
-                    </button>
-
+<button onclick="window.location.href='/settings'" class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all cursor-pointer">
+    <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <g clip-path="url(#clip0_4418_9935)">
+                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M2 12.8794V11.1194C2 10.0794 2.85 9.21945 3.9 9.21945C5.71 9.21945 6.45 7.93945 5.54 6.36945C5.02 5.46945 5.33 4.29945 6.24 3.77945L7.97 2.78945C8.76 2.31945 9.78 2.59945 10.25 3.38945L10.36 3.57945C11.26 5.14945 12.74 5.14945 13.65 3.57945L13.76 3.38945C14.23 2.59945 15.25 2.31945 16.04 2.78945L17.77 3.77945C18.68 4.29945 18.99 5.46945 18.47 6.36945C17.56 7.93945 18.3 9.21945 20.11 9.21945C21.15 9.21945 22.01 10.0694 22.01 11.1194V12.8794C22.01 13.9194 21.16 14.7794 20.11 14.7794C18.3 14.7794 17.56 16.0594 18.47 17.6294C18.99 18.5394 18.68 19.6994 17.77 20.2194L16.04 21.2094C15.25 21.6794 14.23 21.3994 13.76 20.6094L13.65 20.4194C12.75 18.8494 11.27 18.8494 10.36 20.4194L10.25 20.6094C9.78 21.3994 8.76 21.6794 7.97 21.2094L6.24 20.2194C5.33 19.6994 5.02 18.5294 5.54 17.6294C6.45 16.0594 5.71 14.7794 3.9 14.7794C2.85 14.7794 2 13.9194 2 12.8794Z" stroke="#faeded" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+            </g>
+            <defs>
+                <clipPath id="clip0_4418_9935">
+                    <rect width="24" height="24" fill="white"/>
+                </clipPath>
+            </defs>
+        </svg>
+    </div>
+    <span class="font-medium">Settings</span>
+</button>
                     <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all">
                         <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
@@ -239,25 +251,26 @@
                         <span class="font-medium">About</span>
                     </button>
 
-                    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all border-b border-white/5 pb-3">
-                        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
-<g clip-path="url(#clip0_4418_8377)">
-<path d="M7.49997 12.0005C7.49997 11.3374 7.64788 10.7076 7.91075 10.1377C8.11425 9.69642 8.07923 9.15973 7.73563 8.81613L5.15856 6.23906C4.7485 5.829 4.07238 5.85053 3.74139 6.32671C2.62095 7.93866 1.96997 9.89445 1.96997 12.0005C1.96997 14.1048 2.61994 16.0592 3.73274 17.6705C4.06275 18.1483 4.7399 18.1714 5.15104 17.7613L7.73411 15.1848C8.07848 14.8413 8.1139 14.304 7.91029 13.8623C7.64771 13.2926 7.49997 12.6632 7.49997 12.0005Z" fill="white" style="fill: var(--fillg);"/>
-<path d="M12 7.5C12.6631 7.5 13.2928 7.64791 13.8628 7.91078C14.304 8.11428 14.8407 8.07926 15.1843 7.73566L17.7335 5.18643C18.1428 4.77717 18.1223 4.10256 17.6476 3.77141C16.0415 2.65097 14.0844 2 11.97 2C9.86577 2 7.91868 2.64985 6.30974 3.76248C5.83212 4.09277 5.809 4.76993 6.2191 5.18107L8.78017 7.74868C9.12607 8.09546 9.66803 8.12873 10.1116 7.92105C10.6854 7.6524 11.3237 7.5 12 7.5Z" fill="white" style="fill: var(--fillg);"/>
-<path d="M19.89 5.90633C19.7123 5.6767 19.3749 5.66475 19.1694 5.8698L15.9506 9.08034C15.7772 9.25329 15.7573 9.52498 15.8812 9.73622C16.2716 10.4017 16.4999 11.1724 16.4999 12.0002C16.4999 12.8283 16.2715 13.5992 15.8809 14.2647C15.7571 14.4757 15.7768 14.7471 15.9498 14.9201L19.1694 18.1397C19.3749 18.3452 19.7126 18.3334 19.8904 18.1035C21.1956 16.4152 21.9699 14.2971 21.9699 12.0002C21.9699 9.7032 21.1955 7.5934 19.89 5.90633Z" fill="white" style="fill: var(--fillg);"/>
-<path d="M12 16.5004C11.1719 16.5004 10.401 16.2719 9.73546 15.8814C9.52445 15.7576 9.25306 15.7773 9.08006 15.9503L5.83049 19.1999C5.625 19.4053 5.63675 19.7431 5.86665 19.9208C7.55497 21.2261 9.67312 22.0004 11.97 22.0004C14.2771 22.0004 16.3969 21.2254 18.0778 19.9111C18.3057 19.7329 18.3164 19.3968 18.1117 19.1922L14.8871 15.9676C14.7153 15.7958 14.4463 15.775 14.2358 15.8964C13.5727 16.2789 12.8113 16.5004 12 16.5004Z" fill="white" style="fill: var(--fillg);"/>
-</g>
-<defs>
-<clipPath id="clip0_4418_8377">
-<rect width="24" height="24" fill="white"/>
-</clipPath>
-</defs>
-</svg>
-                        </div>
-                        <span class="font-medium">Help</span>
-                    </button>
-
+ <a href="https://t.me/delta_808" target="_blank" class="block w-full">
+    <button class="group flex items-center gap-3 w-full p-2 text-[13px] text-white/90 hover:bg-white/[0.08] rounded-xl transition-all border-b border-white/5 pb-3">
+        <div class="w-8 h-8 flex items-center justify-center bg-zinc-800/50 rounded-lg shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#faeded">
+                <g clip-path="url(#clip0_4418_8377)">
+                    <path d="M7.49997 12.0005C7.49997 11.3374 7.64788 10.7076 7.91075 10.1377C8.11425 9.69642 8.07923 9.15973 7.73563 8.81613L5.15856 6.23906C4.7485 5.829 4.07238 5.85053 3.74139 6.32671C2.62095 7.93866 1.96997 9.89445 1.96997 12.0005C1.96997 14.1048 2.61994 16.0592 3.73274 17.6705C4.06275 18.1483 4.7399 18.1714 5.15104 17.7613L7.73411 15.1848C8.07848 14.8413 8.1139 14.304 7.91029 13.8623C7.64771 13.2926 7.49997 12.6632 7.49997 12.0005Z" fill="white"/>
+                    <path d="M12 7.5C12.6631 7.5 13.2928 7.64791 13.8628 7.91078C14.304 8.11428 14.8407 8.07926 15.1843 7.73566L17.7335 5.18643C18.1428 4.77717 18.1223 4.10256 17.6476 3.77141C16.0415 2.65097 14.0844 2 11.97 2C9.86577 2 7.91868 2.64985 6.30974 3.76248C5.83212 4.09277 5.809 4.76993 6.2191 5.18107L8.78017 7.74868C9.12607 8.09546 9.66803 8.12873 10.1116 7.92105C10.6854 7.6524 11.3237 7.5 12 7.5Z" fill="white"/>
+                    <path d="M19.89 5.90633C19.7123 5.6767 19.3749 5.66475 19.1694 5.8698L15.9506 9.08034C15.7772 9.25329 15.7573 9.52498 15.8812 9.73622C16.2716 10.4017 16.4999 11.1724 16.4999 12.0002C16.4999 12.8283 16.2715 13.5992 15.8809 14.2647C15.7571 14.4757 15.7768 14.7471 15.9498 14.9201L19.1694 18.1397C19.3749 18.3452 19.7126 18.3334 19.8904 18.1035C21.1956 16.4152 21.9699 14.2971 21.9699 12.0002C21.9699 9.7032 21.1955 7.5934 19.89 5.90633Z" fill="white"/>
+                    <path d="M12 16.5004C11.1719 16.5004 10.401 16.2719 9.73546 15.8814C9.52445 15.7576 9.25306 15.7773 9.08006 15.9503L5.83049 19.1999C5.625 19.4053 5.63675 19.7431 5.86665 19.9208C7.55497 21.2261 9.67312 22.0004 11.97 22.0004C14.2771 22.0004 16.3969 21.2254 18.0778 19.9111C18.3057 19.7329 18.3164 19.3968 18.1117 19.1922L14.8871 15.9676C14.7153 15.7958 14.4463 15.775 14.2358 15.8964C13.5727 16.2789 12.8113 16.5004 12 16.5004Z" fill="white"/>
+                </g>
+                <defs>
+                    <clipPath id="clip0_4418_8377">
+                        <rect width="24" height="24" fill="white"/>
+                    </clipPath>
+                </defs>
+            </svg>
+        </div>
+        <span class="font-medium">Help</span>
+    </button>
+</a>
                     <a href="/logout" class="group flex items-center gap-3 w-full p-2 text-[13px] text-red-400 hover:bg-red-500/10 rounded-xl transition-all">
                         <div class="w-8 h-8 flex items-center justify-center bg-red-500/10 rounded-lg shrink-0">
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#b83030">
@@ -291,19 +304,31 @@
 
     <div class="flex-1 flex flex-col h-full relative">
         <header class="h-14 border-b border-[#27272a] flex items-center justify-between px-6">
-            <div class="flex items-center gap-2">
-                <span class="font-bold tracking-tighter text-xl">CRYPTON <span class="text-zinc-500">AI</span></span>
-            </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 ml-12 md:ml-0">
+    <span class="font-bold tracking-tighter text-xl text-white">
+        CRYPTON <span class="text-zinc-500">AI</span>
+    </span>
+</div>
+            <!-- <div class="flex items-center gap-4">
                  <button class="text-zinc-500 hover:text-white transition"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button>
-            </div>
+            </div> -->
         </header>
 
         <div id="chat-window" class="flex-1 overflow-y-auto p-4 md:px-20 md:py-10 space-y-10">
             <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-6">
                 <div class="w-16 h-16 bg-zinc-900 border border-[#27272a] rounded-3xl flex items-center justify-center shadow-2xl">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-                </div>
+<svg xmlns="http://www.w3.org/2000/svg" width="39" height="39" viewBox="0 0 24 24" fill="#fff">
+<g clip-path="url(#clip0_4418_8984)">
+<path d="M11.7499 9.42999L8.49992 15L7.86991 16.09L5.39991 20.31C5.21991 20.63 4.75992 20.64 4.55992 20.33L1.17991 15.28C1.06991 15.11 1.06991 14.89 1.17991 14.72L4.84993 9.22C4.93993 9.08 5.09991 9 5.26991 9H11.4999L11.7499 9.42999Z" fill="white" style="fill: var(--fillg);"/>
+<path d="M22.8401 14.73L16.1401 3.25C16.0601 3.09 15.8901 3 15.7101 3H8.87012C8.48012 3 8.24012 3.42 8.44012 3.75L11.5001 9L11.7501 9.42999L14.5601 14.25C14.7601 14.58 14.5201 15 14.1301 15H8.50012L7.87012 16.09C8.05012 15.77 8.51011 15.76 8.71011 16.07L11.8501 20.78C11.9401 20.92 12.1001 21 12.2701 21H18.7301C18.9001 21 19.0601 20.92 19.1501 20.78L22.8301 15.26C22.9301 15.1 22.9401 14.9 22.8401 14.73Z" fill="white" style="fill: var(--fillg);"/>
+</g>
+<defs>
+<clipPath id="clip0_4418_8984">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg> 
+               </div>
                 <h1 class="text-3xl font-bold tracking-tight">Qanday yordam bera olaman?</h1>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl w-full">
                     <button onclick="useSuggestion('Python-da Telegram bot yozish')" class="p-4 text-sm border border-[#27272a] rounded-2xl text-left hover:bg-zinc-900 hover:border-zinc-700 transition group flex justify-between items-center">
@@ -311,7 +336,7 @@
                         <svg class="opacity-0 group-hover:opacity-100 transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                     </button>
                     <button onclick="useSuggestion('Sog\'lom ovqatlanish rejasi')" class="p-4 text-sm border border-[#27272a] rounded-2xl text-left hover:bg-zinc-900 hover:border-zinc-700 transition group flex justify-between items-center">
-                        <span>Sog'lom ovqatlanish rejasi...</span>
+                        <span>OSINT o'zi nma? ...</span>
                         <svg class="opacity-0 group-hover:opacity-100 transition" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
                     </button>
                 </div>
@@ -357,18 +382,25 @@
                         <span class="ios-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
                         Rasm yuklash
                     </button>
-                    <button disabled onclick="handleFileUpload('document')" class="flex items-center gap-3 w-full p-3 text-xs text-zinc-300 hover:bg-zinc-800 rounded-xl transition group disabled:cursor-not-allowed disabled:opacity-50">
-                        <span class="ios-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
-                        Hujjatlar yuklash
-                    </button>
-                    <button disabled onclick="handleFileUpload('video')" class="flex items-center gap-3 w-full p-3 text-xs text-zinc-300 hover:bg-zinc-800 rounded-xl transition group disabled:cursor-not-allowed disabled:opacity-50">
-                        <span class="ios-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
-                            </svg>
-                        </span>
-                        Video yuklash
-                    </button>
+                  <button disabled class="flex items-center gap-3 w-full p-3 text-xs text-zinc-500 bg-transparent rounded-xl cursor-not-allowed opacity-50 pointer-events-none">
+    <span class="ios-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+        </svg>
+    </span>
+    Hujjatlar yuklash
+</button>
+
+<button disabled class="flex items-center gap-3 w-full p-3 text-xs text-zinc-500 bg-transparent rounded-xl cursor-not-allowed opacity-50 pointer-events-none">
+    <span class="ios-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="23 7 16 12 23 17 23 7"/>
+            <rect x="1" y="5" width="15" height="14" rx="2"/>
+        </svg>
+    </span>
+    Video yuklash 
+</button>
 
                 </div>
 
@@ -392,15 +424,16 @@
     </button>
 
     <div class="relative group">
-        <button id="model-dropdown-btn" class="px-3 h-10 rounded-xl hover:bg-zinc-800 text-zinc-400 transition flex items-center gap-2 border border-transparent hover:border-zinc-700">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            <span id="active-model-display" class="text-[11px] font-bold uppercase tracking-wider">Llama 3</span>
-        </button>
-
+       <button id="model-dropdown-btn"  class="px-3 h-10 rounded-xl text-zinc-600 transition flex items-center gap-2 border border-transparent ">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+    <span id="active-model-display" class="text-[11px] font-bold uppercase tracking-wider">Llama 3</span>
+</button>
         <div id="model-dropdown-menu" class="hidden absolute bottom-full left-0 mb-3 w-52 bg-[#1c1c1f] border border-[#27272a] rounded-2xl shadow-2xl z-50 dropdown-animate p-1.5">
-           <button disabled onclick="selectModel('Claude 3.5', 'claude')" class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-300 hover:bg-zinc-800 rounded-xl transition uppercase tracking-wide disabled:cursor-not-allowed ">
+ <button disabled class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-500 bg-transparent rounded-xl transition uppercase tracking-wide cursor-not-allowed opacity-50 pointer-events-none">
     Claude 3.5 Sonnet
-    <i class="fa-solid fa-brain opacity-50"></i>
+    <i class="fa-solid fa-brain opacity-30"></i>
 </button>
 
 <button onclick="selectModel('Llama 3.1', 'llama')" class="flex items-center justify-between w-full p-3 text-[11px] font-bold text-zinc-300 hover:bg-zinc-800 rounded-xl transition uppercase tracking-wide">
@@ -449,53 +482,70 @@
 let currentChatId = "chat_" + Date.now();
 // Yangi chat yaratish funksiyasi
 
-
+const historyContainer = document.getElementById('chat-history-list');
 
 
 
 // Sahifa yuklanganda chatlar tarixini yuklash
 async function loadChatList() {
+    console.log("Sidebar yuklanmoqda..."); // Debug uchun
+    const historyContainer = document.getElementById('chat-history-list');
+    
+    if (!historyContainer) {
+        console.error("Xato: HTMLda 'chat-history-list' ID-si topilmadi!");
+        return;
+    }
+
     try {
         const response = await fetch('/api/get_chats');
-        const chats = await response.json();
         
-        const historyContainer = document.getElementById('chat-history-list'); // Sidebardagi container ID si
-        if (!historyContainer) return;
+        if (response.status === 401) {
+            console.warn("Sessiya tugagan, login sahifasiga o'ting.");
+            return;
+        }
+
+        const chats = await response.json();
+        console.log("Kelgan chatlar:", chats); // Bazadan nima kelayotganini ko'rish
 
         historyContainer.innerHTML = ''; // Tozalash
+
+        if (chats.length === 0) {
+            historyContainer.innerHTML = '<div class="p-4 text-[11px] text-zinc-600 text-center">Tarix bo\'sh</div>';
+            return;
+        }
 
         chats.forEach(chat => {
             const chatItem = document.createElement('div');
             chatItem.className = "group flex items-center justify-between p-3 mb-1 text-xs text-zinc-400 hover:bg-white/[0.05] hover:text-white rounded-xl cursor-pointer transition-all";
+            
             chatItem.innerHTML = `
                 <div class="flex items-center gap-3 truncate pr-2">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                    <span class="truncate">${chat.title}</span>
+                    <span class="truncate">${chat.title || "Yangi chat"}</span>
                 </div>
             `;
-            // Chat ustiga bosganda o'sha chatni yuklash
+            
             chatItem.onclick = () => loadFullChat(chat.chat_id);
             historyContainer.appendChild(chatItem);
         });
+
     } catch (err) {
-        console.error("Chat tarixini yuklashda xato:", err);
+        console.error("Sidebar yuklashda texnik xato:", err);
     }
 }
 
-// Sahifa yuklanganda chaqiramiz
-window.addEventListener('DOMContentLoaded', loadChatList);
-
-
 function startNewChat() {
     // 1. Yangi suhbat uchun unikal ID yaratamiz
+    // Bu ID keyinchalik habar yuborganingda main.py ga yuboriladi
     currentChatId = "chat_" + Date.now();
 
-    // 2. Chat oynasini vizual tozalaymiz
+    // 2. Chat oynasini (markazni) vizual tozalaymiz
     const chatWindow = document.getElementById('chat-window');
+    
     if (chatWindow) {
         // Welcome screen (xuddi v0.dev kabi markazda chiqadi)
         chatWindow.innerHTML = `
-            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-0 translate-y-4 animate-in">
+            <div id="welcome-screen" class="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-0 translate-y-4 animate-in" style="animation: fadeIn 0.5s forwards;">
                 <div class="w-16 h-16 bg-zinc-900 border border-white/5 rounded-3xl flex items-center justify-center shadow-2xl">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
                         <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12A10 10 0 0 1 12 2z"/>
@@ -510,11 +560,18 @@ function startNewChat() {
         `;
     }
 
-    // 3. Inputni tozalaymiz va fokusni unga qaratamiz
-    const userInput = document.getElementById('user-input'); // ID ni tekshirib ko'r
+    // 3. Input maydonini tozalash
+    const userInput = document.getElementById('user-input');
     if (userInput) {
         userInput.value = "";
+        userInput.style.height = "auto"; // Balandlikni reset qilish
         userInput.focus();
+    }
+
+    // 4. Sidebar-ni yangilash (Eski chatlar ro'yxati o'chib ketmasligi uchun)
+    // Bu funksiya mavjud chatlarni qayta yuklaydi
+    if (typeof loadChatList === "function") {
+        loadChatList();
     }
 
     console.log("Yangi chat yaratildi. ID:", currentChatId);
@@ -532,6 +589,52 @@ function addChatToSidebar(id, title) {
 
 // "Yangi chat" tugmasiga event beramiz
 document.getElementById('new-chat-btn').onclick = startNewChat;
+
+
+
+
+
+
+
+async function loadFullChat(chatId) {
+    if (!chatWindow) return;
+    
+    // Welcome screen-ni yashirish
+    const welcome = document.getElementById('welcome-screen');
+    if (welcome) welcome.classList.add('hidden');
+
+    try {
+        const response = await fetch(`/get_chat_messages/${chatId}`);
+        if (!response.ok) throw new Error("404");
+
+        const messages = await response.json();
+        chatWindow.innerHTML = ''; // Oynani tozalash
+
+        messages.forEach(msg => {
+            // Sening appendToUI funksiyangdan foydalanamiz
+            const isUser = msg.role === 'user';
+            const div = document.createElement('div');
+            div.className = `flex ${isUser ? 'justify-end' : 'justify-start'} w-full mb-6 animate-fadeIn`;
+            
+            const bubbleClass = isUser 
+                ? 'bg-[#27272a] border border-[#3f3f46] text-[#fafafa] ml-auto' 
+                : 'text-zinc-200';
+
+            div.innerHTML = `
+                <div class="message-bubble ${bubbleClass} p-5 rounded-[22px] shadow-sm max-w-[80%]">
+                    <div class="content-area">${formatContent(msg.content)}</div>
+                </div>
+            `;
+            chatWindow.appendChild(div);
+        });
+
+        currentChatId = chatId; // Hozirgi chat ID-sini yangilab qo'yamiz
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    } catch (error) {
+        console.error("Xabarlarni yuklashda xato:", error);
+    }
+}
 
 
 
@@ -825,27 +928,6 @@ document.addEventListener('click', (e) => {
 
 
 
-async function loadFullChat(chatId) {
-    currentChatId = chatId; // Global chat ID-ni yangilaymiz
-    console.log("Yuklanayotgan chat ID:", chatId);
-    
-    // Chat oynasini tozalash
-    const chatWindow = document.getElementById('chat-window');
-    chatWindow.innerHTML = '<div class="text-center text-zinc-500 py-10">Yuklanmoqda...</div>';
-
-    try {
-        const response = await fetch(`/api/get_messages/${chatId}`);
-        const messages = await response.json();
-        
-        chatWindow.innerHTML = ''; // Tozalash
-        messages.forEach(msg => {
-            appendToUI(msg.role, msg.content);
-        });
-    } catch (err) {
-        console.error("Xabarlarni yuklashda xato:", err);
-    }
-}
-
 
 
 
@@ -853,6 +935,54 @@ async function loadFullChat(chatId) {
 document.addEventListener('DOMContentLoaded', () => {
     loadChatList();
 });
+
+
+// Sahifa yuklanganda chatlarni olish funksiyasi
+async function loadUserChats() {
+    try {
+        const response = await fetch('/api/get_chats', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        // AGAR 401 XATOSI BO'LSA (Sessiya o'lgan)
+        if (response.status === 401) {
+            console.warn("Sessiya topilmadi, login sahifasiga yo'naltirilmoqda...");
+            window.location.href = '/login'; // Foydalanuvchini loginga qaytaradi
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Chatlarni ekranga chiqarish funksiyasini shu yerda chaqirasiz
+            console.log("Chatlar yuklandi:", data.chats);
+            // displayChats(data.chats); // Masalan shunday
+        }
+
+    } catch (error) {
+        console.error("Chatlarni yuklashda xatolik:", error);
+    }
+}
+
+// Sahifa ochilishi bilan funksiyani ishga tushiramiz
+document.addEventListener('DOMContentLoaded', loadUserChats);
+
+
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    // Sidebarni surish (Ochish/Yopish)
+    sidebar.classList.toggle('-translate-x-full');
+    
+    // Fonni ko'rsatish/yashirish
+    overlay.classList.toggle('hidden');
+}
     </script>
 </body>
 </html>

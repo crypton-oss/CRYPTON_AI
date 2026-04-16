@@ -1,7 +1,7 @@
 from multiprocessing.connection import Client
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
-from supabase import create_client, Client as SupabaseClient # MongoDB o'rniga
+from supabase import create_client, Client , ClientOptions # MongoDB o'rniga
 from werkzeug.security import generate_password_hash, check_password_hash
 from authlib.integrations.flask_client import OAuth 
 from datetime import datetime, timedelta
@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import requests  # SHU QATORNI QO'SHING
 from flask import Flask, request, jsonify, session
 from postgrest.exceptions import APIError # Xatoliklarni ushlash uchun
+import secrets
+import string
+import httpx
 
 # --- 1. ASOSIY APP SOZLAMASI ---
 load_dotenv()
@@ -19,27 +22,53 @@ app = Flask(__name__,
             template_folder=os.path.join(base_dir, '../frontend/templates'), 
             static_folder=os.path.join(base_dir, '../frontend/static'))
 
-@app.route('/')
-def home():
-    # index.html faylingiz frontend/templates ichida bo'lishi kerak
-    return render_template('index.html')
-
-# Vercel uchun
-app = app
 app.secret_key = "anonimcrypton@#0091" 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+
+
+@app.route('/get_chat_messages/<chat_id>')
+def get_chat_messages(chat_id):
+    # Foydalanuvchi tizimga kirganini tekshirish
+    if not session.get('username'):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        # Supabase-dan xabarlarni olish
+        res = supabase.table("messages") \
+            .select("*") \
+            .eq("chat_id", chat_id) \
+            .order("created_at", desc=False) \
+            .execute()
+        
+        # Diqqat: Bu yerda faqat JSON qaytadi
+        return jsonify(res.data)
+    except Exception as e:
+        print(f"Xato: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # --- 2. KONFIGURATSIYA VA ADMIN MA'LUMOTLARI ---
 ADMIN_USERNAME = "nofearadmin"
 ADMIN_PASSWORD = "crypton_hssh"
 ADMIN_SECRET_URL = "crypton-manager-2026-auth"
 
-# --- 3. SUPABASE ULANISHI (MONGODB O'RNIGA) ---
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
-supabase: SupabaseClient = create_client(url, key)
-print("✅ Supabase Bulutli Bazasi Ulandi! (Docker shart emas)")
 
+# Xatolikda aytilganidek 'httpx_client' argumentidan foydalanamiz
+options = ClientOptions(
+    httpx_client=httpx.Client(http2=False)
+)
+
+# Clientni yaratish
+supabase: Client = create_client(url, key, options=options)
+
+print("✅ Supabase Bulutli Bazasi Ulandi! (HTTP/1.1 rejimida)")
+
+# Endi clientni shu sozlama bilan yaratamiz
+supabase: Client = create_client(url, key, options=options)
+
+print("✅ Supabase Bulutli Bazasi Ulandi! (HTTP/1.1 rejimida)")
 # --- 4. GOOGLE OAUTH SOZLAMALARI ---
 oauth = OAuth(app)
 google = oauth.register(
@@ -87,6 +116,26 @@ def admin_login():
             return render_template('admin_login.html', error="Sizning urinishingiz qayd etildi!")
     return render_template('admin_login.html')
 
+
+
+
+@app.route('/api/admin/block_user/<email>', methods=['POST'])
+def block_user(email):
+    # Foydalanuvchini bazadan topamiz
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.is_blocked = True
+        user.blocked_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        db.session.commit()
+        return {"status": "success", "message": "Foydalanuvchi bloklandi"}
+    return {"status": "error", "message": "Foydalanuvchi topilmadi"}, 404
+
+
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
 @app.route('/admin-logout')
 def admin_logout():
     session.pop('admin_logged_in', None) 
@@ -104,15 +153,15 @@ def hidden_admin_page():
 
 @app.route('/api/get_chats', methods=['GET'])
 def get_chats():
-    # 1. Sessiyadan usernameni olamiz (Login qismida session['username'] deb saqlagan edik)
+    # 1. Sessiyani tekshirish (Google bilan kirganda 'user_email' yoki 'username' ishlatiladi)
     current_user = session.get('username')
     
+    # Agar foydalanuvchi topilmasa, 401 qaytaramiz (JS shuni ushlab loginga yuboradi)
     if not current_user:
-        return jsonify([]), 401
+        return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        # 2. Supabase so'rovi
-        # Muhim: .eq("username", current_user) — o'zgaruvchi nomi mos bo'lishi kerak
+        # 2. Supabase so'rovi - faqat shu foydalanuvchiga tegishli xabarlarni olish
         res = supabase.table("messages") \
             .select("chat_id, content, created_at") \
             .eq("username", current_user) \
@@ -123,7 +172,7 @@ def get_chats():
         if not res.data:
             return jsonify([]), 200
 
-        # 3. Chatlarni unikal qilish (Faqat eng birinchi xabarini sarlavha qilish)
+        # 3. Chatlarni unikal qilish (Faqat eng oxirgi xabarni sarlavha qilish)
         seen_chats = set()
         unique_chats = []
         
@@ -132,21 +181,21 @@ def get_chats():
             if chat_id and chat_id not in seen_chats:
                 seen_chats.add(chat_id)
                 
-                # Sarlavhani tozalash (masalan, ortiqcha enterlarni olib tashlash)
-                clean_content = msg['content'].replace('\n', ' ').strip()
+                clean_content = msg['content'].replace('\n', '').strip()
                 title = clean_content[:25] + "..." if len(clean_content) > 25 else clean_content
                 
                 unique_chats.append({
                     "chat_id": chat_id,
                     "title": title,
-                    "date": msg['created_at'] # Saralash uchun sana ham foydali bo'lishi mumkin
+                    "date": msg['created_at']
                 })
 
         return jsonify(unique_chats)
 
     except Exception as e:
-        print(f"Sidebar Error: {str(e)}")
-        return jsonify({"error": "Serverda xatolik yuz berdi"}), 500
+        # Xatolikni logga yozamiz
+        print(f"CRITICAL Sidebar Error: {str(e)}")
+        return jsonify({"error": "Server error"}), 500
 # --- 6. API MANZILLARI ---
 
 @app.route(f'/api/{ADMIN_SECRET_URL}/blacklist')
@@ -314,6 +363,64 @@ def update_pin():
 
 # --- 7. FOYDALANUVCHI INTERFEYSI VA OAUTH ---
 
+@app.route('/settings')
+def settings_page():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('settings.html')
+
+# Sozlamalarni yangilash uchun API (Kursor va Tarix uchun)
+@app.route('/api/update_settings', methods=['POST'])
+def update_settings():
+    if not session.get('logged_in'):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    setting_type = data.get('type') # 'cursor' yoki 'save_history'
+    value = data.get('value')
+
+    if setting_type == 'cursor':
+        session['user_cursor'] = value
+    elif setting_type == 'save_history':
+        session['save_history'] = value # True yoki False
+    
+    return jsonify({"success": True})
+
+# Akkauntni o'chirish (Supabase dan foydalanuvchini o'chirish)
+@app.route('/api/delete_account', methods=['POST'])
+def delete_account_api():
+    if not session.get('logged_in'):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    email = session.get('user_email')
+    
+    try:
+        # Supabase-dan o'chirish
+        supabase.table("users").delete().eq("email", email).execute()
+        session.clear() # Sessiyani tozalash
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/update_profile_session', methods=['POST'])
+def update_profile_session():
+    if not session.get('logged_in'):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    field = data.get('field')  # 'username', 'email' yoki 'password'
+    value = data.get('value')
+
+    if field == 'username':
+        session['username'] = value
+        session['user_name'] = value
+    elif field == 'email':
+        session['user_email'] = value
+    elif field == 'password':
+        session['user_password'] = value
+    
+    return jsonify({"success": True})
+
 @app.route('/')
 def landing():
     return render_template('landing.html')
@@ -333,7 +440,6 @@ def register():
         supabase.table("users").insert(user_data).execute()
         return redirect(url_for('login'))
     return render_template('register.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -348,17 +454,27 @@ def login():
         
         if res.data:
             user = res.data[0]
+            
+            # --- BLOKLASHNI TEKSHIRISH (YANGI QISIM) ---
+            if user.get('is_blocked') == True:
+                return jsonify({
+                    "success": False, 
+                    "status": "blocked",
+                    "message": "Sizning akkauntingiz bloklandi!",
+                    "blocked_at": user.get('blocked_at', 'Nomalum vaqtda')
+                }), 403
+            # ------------------------------------------
+            
             user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
             if user_ip and ',' in user_ip: user_ip = user_ip.split(',')[0].strip()
             
             supabase.table("users").update({"last_ip": user_ip}).eq("email", email).execute()
             
-            # MUHIM: Sessiyani sozlash
-            session.permanent = True # Sessiya brauzer yopilsa ham o'chib ketmasligi uchun
-            app.permanent_session_lifetime = timedelta(days=7) # 7 kungacha saqlaydi
+            session.permanent = True 
+            app.permanent_session_lifetime = timedelta(days=7) 
             
             session['logged_in'] = True
-            session['username'] = user.get('username') # Bazadagi haqiqiy usernameni oladi# MANA SHU QATORNI QO'SHDIK (Supabase'dagi ID)
+            session['username'] = user.get('username')
             session['user_email'] = user['email']
             session['user_name'] = user.get('username', 'Foydalanuvchi')
             
@@ -368,6 +484,46 @@ def login():
         
     return render_template('login.html')
 
+
+@app.route('/update_session', methods=['POST'])
+def update_session():
+    if 'logged_in' not in session:
+        return jsonify({"success": False, "message": "Avval tizimga kiring"}), 401
+    
+    data = request.json
+    field = data.get('field') # 'username' yoki 'email'
+    new_value = data.get('value')
+    
+    if field == 'username':
+        session['username'] = new_value
+        session['user_name'] = new_value # Har ehtimolga qarshi ikkalasini ham yangilaymiz
+    elif field == 'email':
+        session['user_email'] = new_value
+        
+    return jsonify({"success": True, "message": "Sessiya yangilandi"})
+
+
+
+@app.route('/profile')
+def profile_page():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
+    # Tutuq belgisi bor so'zlardan voz kechamiz (xatolikni oldini olish uchun)
+    u_name = session.get('username', "Aniqlanmagan")
+    u_email = session.get('user_email', "Aniqlanmagan")
+    u_pass = session.get('user_password', "NoPasswordSet") 
+
+    try:
+        # Ma'lumotlarni HTML-ga uzatishda kalit so'zlarni tekshir
+        return render_template('profile.html', 
+                               username=u_name, 
+                               email=u_email, 
+                               password=u_pass)
+    except Exception as e:
+        print(f"❌ Render Error: {e}")
+        return f"Xatolik yuz berdi: {e}", 500
+    
 @app.route('/login/google')
 def google_login():
     redirect_uri = url_for('google_authorize', _external=True)
@@ -380,21 +536,47 @@ def google_authorize():
         resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
         user_info = resp.json()
         email = user_info['email']
-        g_name = user_info.get('name', email.split('@')[0]) 
         
+        # Google'dan kelgan ismni olish (agar ism bo'lmasa emailning boshi)
+        email_prefix = email.split('@')[0]
+        g_name = email_prefix[:7]
+        # 1. Bazadan foydalanuvchini tekshirish
         res = supabase.table("users").select("*").eq("email", email).execute()
+        
         if not res.data:
-            supabase.table("users").insert({"username": g_name, "email": email, "password": "", "reg_date": datetime.now().isoformat()}).execute()
-            current_username = g_name
-        else:
-            current_username = res.data[0].get('username', g_name)
+            # YANGI FOYDALANUVCHI UCHUN "MILITARY GRADE" PAROL YARATAMIZ
+            secure_password = generate_complex_password()
             
+            supabase.table("users").insert({
+                "username": g_name, 
+                "email": email, 
+                "password": secure_password, # Bo'sh emas, murakkab parol!
+                "reg_date": datetime.now().isoformat(),
+                "is_blocked": False
+            }).execute()
+            current_username = g_name
+            current_password = secure_password
+        else:
+            # Mavjud foydalanuvchi ma'lumotlarini olish
+            current_username = res.data[0].get('username', g_name)
+            current_password = res.data[0].get('password', "O'rnatilmagan")
+            
+        # 2. SESSİYANI TO'LIQ O'RNATISH
+        session.permanent = True
         session['logged_in'] = True
         session['user_email'] = email
+        session['username'] = current_username
         session['user_name'] = current_username
+        # Profil sahifasida ko'rsatish uchun parolni ham vaqtincha sessiyaga yozamiz
+        session['user_password'] = current_password 
+        
+        print(f"✅ Google Login: {current_username} uchun xavfsiz sessiya ochildi.")
+        
         return redirect(url_for('chat_interface'))
+        
     except Exception as e:
-        return f"Google orqali kirishda xatolik: {e}"
+        print(f"❌ Google Callback Error: {str(e)}")
+        return f"Xatolik: {str(e)}"
 
 @app.route('/chat')
 def chat_interface():
@@ -410,7 +592,9 @@ def logout():
 # --- 8. AI VA LOGGING ---
 
 
-
+def generate_random_password(length=16):
+    alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
+    return ''.join(secrets.choice(alphabet) for i in range(length))
 
 def ask_openrouter(model_id, query):
     api_key = os.getenv("OPENROUTER_API_KEY")
