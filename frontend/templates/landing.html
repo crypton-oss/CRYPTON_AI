@@ -638,6 +638,128 @@
         margin-top: 30%;
     }
 }
+
+/* Umumiy linklar stili (kodni tozalash uchun) */
+.nav-link {
+    border: 1px solid rgb(70, 69, 69);
+    padding: 9px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: white;
+    font-size: 14px;
+}
+/* Wrapper - tugma va menyuni ushlab turadi */
+.crypton-select-wrapper {
+    position: relative;
+    display: inline-block;
+    list-style: none;
+    margin-top: 1.4%;
+}
+
+.crypton-trigger {
+    display: flex;
+    align-items: center;    /* Vertikal markazlash */
+    justify-content: center; /* Gorizontal markazlash */
+    gap: 10px;              /* Bayroq, matn va strelka orasidagi masofa */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;    /* iOS uslubida yumaloqroq */
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;       /* Tugma o'lchami o'zgarmasligi uchun */
+}
+#displayFlag {
+    font-size: 18px;        /* Emojini matn bilan moslash */
+    line-height: 1;         /* Ortiqcha joyni olib tashlash */
+    display: flex;
+    align-items: center;
+}
+#displayText {
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+.arrow-icon::after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid rgba(255, 255, 255, 0.7);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+    transform: rotate(45deg); /* Pastga qaragan strelka yasaymiz */
+    margin-bottom: 3px;      /* Matn bilan bir chiziqqa keltirish uchun */
+    transition: transform 0.3s ease;
+}
+.crypton-menu.active + .crypton-trigger .arrow-icon::after {
+    transform: rotate(-135deg);
+}
+
+.crypton-trigger:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Menyu stili */
+.crypton-menu {
+    display: none; /* Dastlab yopiq */
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 160px;
+    background: #121212; /* To'q qora fon */
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 999999;
+    overflow: hidden;
+}
+
+/* Menyu ochilganda ishlaydigan klass */
+.crypton-menu.active {
+    display: block !important;
+    animation: cryptonFade 0.2s ease-out;
+}
+
+.crypton-item {
+    padding: 10px 16px;
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    
+    /* ASOSIY QISM: */
+    display: flex;         /* Elementlarni yonma-yon qiladi */
+    align-items: center;   /* Tepadan va pastdan bir xil masofada (markazda) saqlaydi */
+    gap: 12px;             /* Bayroq va matn orasidagi masofa */
+}
+.crypton-item img {
+    display: block;        /* Rasm atrofidagi ortiqcha bo'shliqlarni oladi */
+    object-fit: contain;   /* Rasmni shaklini buzmaydi */
+    flex-shrink: 0;        /* Rasm qisqarib ketmasligi uchun */
+}
+.crypton-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.crypton-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+@keyframes cryptonFade {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Arrow (uchburchak) icon */
+.arrow-icon::after {
+    content: '▼';
+    font-size: 10px;
+    margin-left: 5px;
+    opacity: 0.7;
+}
     </style>
 </head>
 <body class="dark-mode">
@@ -649,15 +771,39 @@
                 <button class="menu-toggle" id="menuToggle">☰</button>
 
                 <ul class="nav-menu" id="navMenu">
-                    <li><a href="https://t.me/anonim_crypton" style="border: 1px solid rgb(70, 69, 69);padding: 9px 16px; border-radius: 20px;">Telegram</a></li>
-                    <!-- <li><a href="{{ url_for('privacy') }}">Maxfiylik</a></li> -->
-                    <li><a href="#pricing" style="border: 1px solid rgb(70, 69, 69);padding: 9px 16px; border-radius: 20px;">Premuim</a></li>
-                    <li><a href="#about" style="border: 1px solid rgb(70, 69, 69);padding: 10px 20px; border-radius: 20px;">Haqida</a></li>
+                    <li style="margin-top: 2%;"><a href="https://t.me/anonim_crypton" data-i18n="telegram" style="border: 1px solid rgb(70, 69, 69);padding: 9px 16px; border-radius: 20px;">Telegram</a></li>
+                    <li style="margin-top: 2%;"><a href="#pricing" data-i18n="Opensource" style="border: 1px solid rgb(70, 69, 69);padding: 9px 16px; border-radius: 20px;">OpenSource</a></li>
+                    <li class="crypton-select-wrapper">
+<div class="crypton-trigger" id="newLangTrigger">
+    <div id="displayFlag">
+        <img width="24" height="24" src="https://img.icons8.com/external-others-iconmarket/64/external-national-flags-others-iconmarket-9.png" alt="uz-flag" />
+    </div>
+    <span id="displayText">UZ</span>
+    <i class="arrow-icon"></i>
+</div>
+    
+ <div class="crypton-menu" id="newLangMenu">
+    <div class="crypton-item" onclick="selectLang('uz', '🇺🇿')">
+        <img width="24" height="24" src="https://img.icons8.com/external-others-iconmarket/64/external-national-flags-others-iconmarket-9.png" alt="uz-flag" /> 
+        <span>O'zbekcha</span>
+    </div>
+    
+    <div class="crypton-item" onclick="selectLang('en', '🇺🇸')">
+        <img width="24" height="24" src="https://img.icons8.com/color/48/usa.png" alt="usa-flag"/> 
+        <span>English</span>
+    </div>
+    
+    <div class="crypton-item" onclick="selectLang('ru', '🇷🇺')">
+        <img width="24" height="24" src="https://img.icons8.com/emoji/48/russia-emoji.png" alt="ru-flag"/> 
+        <span>Русский</span>
+    </div>
+</div>
+</li>
                 </ul>
 
                 <ul class="nav-actions">
-                    <li><a href="{{ url_for('login') }}" class="btn btn-secondary" style="padding: 8px 16px;">Login</a></li>
-                    <li><a href="{{ url_for('register') }}" class="btn btn-primary" style="padding: 8px 16px;">Ro'yxatdan o'tish</a></li>
+                    <li style="margin-top: 2%;"><a href="{{ url_for('login') }}" data-i18n="login" class="btn btn-secondary" style="padding: 8px 16px;">Login</a></li>
+                    <li style="margin-top: 2%;"><a href="{{ url_for('register') }}" data-i18n="register" class="btn btn-primary" style="padding: 8px 16px;">Ro'yxatdan o'tish</a></li>
                 </ul>
             </div>
         </nav>
@@ -673,21 +819,24 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <a href="#" class="hero-badge">
-                        <span>Sunniy intelekt modellar uchun qo'llanmalar</span>
+                        <span data-i18n="qollanmalar">Sunniy intelekt modellar uchun qo'llanmalar</span>
                         <span class="badge-divider"></span>
                         <span class="badge-icon">→</span>
                     </a>
 
 
-                    <h1> Mijozlar bilan aloqa qilish uchun zamonaviy yechimlar</h1> 
+                    <h1 data-i18n="aloqa"> Mijozlar bilan aloqa qilish uchun zamonaviy yechimlar</h1> 
 
-                    <p class="hero-description">
+                    <p class="hero-description" data-i18n="description">
                         CRYPTON-AI, sizga Hacking,OSINT,Malware tahlil, va boshqa ko'plab sohalarda yordam beradigan kuchli sun'iy intellekt asosidagi platforma. Bizning maqsadimiz bitta
                     </p>
 
                     <div class="button-group">
-                        <a href="{{ url_for('register') }}" class="btn btn-primary">Start </a>
-                        <a href="https://t.me/delta_808" class="btn btn-secondary">Admin</a>
+                        <!-- <a href="{{ url_for('register') }}" class="btn btn-primary">Start </a>
+                        <a href="https://t.me/delta_808" class="btn btn-secondary">Admin</a> -->
+                        <br>
+                        <p data-i18n="donate">AI rivoji uchun donat tugma.</p>
+                        <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="ozodbekusmc" data-color="#FFDD00" data-emoji=""  data-font="Inter" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
                     </div>
                 </div>
 
@@ -707,7 +856,7 @@
         <section class="customers-section">
             <div class="customers-container" id="customersGroup">
                 <div class="customers-overlay" id="customersOverlay">
-                    <a href="/" class="overlay-link">
+                    <a href="/" class="overlay-link" data-i18n="meet_customers">
                         Meet Our Customers
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="9 18 15 12 9 6"></polyline>
@@ -751,42 +900,84 @@
         
         <div class="faq-scroll-area">
             <div class="faq-header">
-                <h2>Tez-tez beriladigan savollar</h2>
-                <p>Modellar va tizim haqida asosiy ma'lumotlar</p>
+                <h2 data-i18n="questions">Tez-tez beriladigan savollar</h2>
+                <p data-i18n="models">Modellar va tizim haqida asosiy ma'lumotlar</p>
             </div>
 
             <div class="faq-body">
                 <div class="faq-item">
-                    <strong>Hisobni boshqarish</strong>
-                    <p>Ro'yxatdan o'tish sahifasiga o'ting va elektron pochtangizni tasdiqlang. Ijtimoiy tarmoqlar orqali ham kirish mumkin.</p>
+                    <strong data-i18n="account_management">Hisobni boshqarish</strong>
+                    <p data-i18n="account_management_desc">Ro'yxatdan o'tish sahifasiga o'ting va elektron pochtangizni tasdiqlang. Ijtimoiy tarmoqlar orqali ham kirish mumkin.</p>
                 </div>
                 <div class="faq-item">
-                    <strong>Ma'lumotlar xavfsizligi</strong>
-                    <p>Tizim to'liq admin tomonidan test qilinib tekshiriladi.Barcha malumotlaringiz sir saqlanadi</p>
+                    <strong data-i18n="data_security">Ma'lumotlar xavfsizligi</strong>
+                    <p data-i18n="data_security_desc">Tizim to'liq admin tomonidan test qilinib tekshiriladi.Barcha malumotlaringiz sir saqlanadi</p>
                 </div>
                 <div class="faq-item">
-                    <strong>Texnik yordam</strong>
-                    <p>Mijozlarni qo'llab-quvvatlash admini 24/7 rejimida ishlaydi. Telegram orqali bog'lanishingiz mumkin.</p>
+                    <strong data-i18n="technical_support">Texnik yordam</strong>
+                    <p data-i18n="technical_support_desc">Mijozlarni qo'llab-quvvatlash admini 24/7 rejimida ishlaydi. Telegram orqali bog'lanishingiz mumkin.</p>
                 </div>
                 <div class="faq-item">
-                    <strong>To'lov usullari</strong>
-                    <p>Tez orada!</p>
+                    <strong data-i18n="payment_methods">To'lov usullari</strong>
+                    <p data-i18n="payment_methods_desc">Tez orada!</p>
                 </div>
             </div>
         </div>
 
         <div class="faq-footer">
-            <button class="faq-btn btn-sec" id="faqCancel">Bekor qilish</button>
-            <button class="faq-btn btn-pri" id="faqOk">Tushunarli</button>
+            <button class="faq-btn btn-sec" id="faqCancel" data-i18n="cancel">Bekor qilish</button>
+            <button class="faq-btn btn-pri" id="faqOk" data-i18n="ok">Tushunarli</button>
         </div>
     </div>
 </div>
 
     </main>
+<script src="{{ url_for('static', filename='js/language.js') }}"></script>
 
-    <script>
 
-  
+<script>
+// 1. Tanlash funksiyasi
+function selectLang(lang, flag) {
+    // Matnlarni yangilash
+    document.getElementById('displayFlag').innerText = flag;
+    document.getElementById('displayText').innerText = lang.toUpperCase();
+    
+    // Lug'atni yangilash (sening updateTexts funksiyangni chaqiradi)
+    if (typeof updateTexts === "function") {
+        updateTexts(lang);
+    }
+    
+    // Saqlash
+    localStorage.setItem('selectedLang', lang);
+    localStorage.setItem('selectedFlag', flag);
+    
+    // Menyuni yopish
+    document.getElementById('newLangMenu').classList.remove('active');
+}
+
+// 2. Ochish va Yopish mantiqi
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.getElementById('newLangTrigger');
+    const menu = document.getElementById('newLangMenu');
+
+    if (trigger && menu) {
+        // Tugmani bosganda menyuni ochish/yopish
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('active');
+        });
+
+        // Ekranni istalgan joyini bosganda yopish
+        window.addEventListener('click', () => {
+            menu.classList.remove('active');
+        });
+    }
+    
+    // Avvalgi holatni yuklash
+    const savedL = localStorage.getItem('selectedLang') || 'uz';
+    const savedF = localStorage.getItem('selectedFlag') || '🇺🇿';
+    selectLang(savedL, savedF);
+});
 
         // FAQ Modal Logic
 const heroBadge = document.querySelector('.hero-badge');
@@ -842,21 +1033,7 @@ faqModal.querySelector('.faq-overlay').addEventListener('click', () => toggleMod
             });
         });
 
-        // Customers Section Hover Effect
-       // const customersGroup = document.getElementById('customersGroup');
-       // const customersGrid = document.getElementById('customersGrid');
-       // const customersOverlay = document.getElementById('customersOverlay');
-
-       // customersGroup.addEventListener('mouseenter', () => {
-           // customersGrid.classList.add('blur');
-           // customersOverlay.classList.add('show');
-       // });
-
-        //customersGroup.addEventListener('mouseleave', () => {
-          //  customersGrid.classList.remove('blur');
-            //customersOverlay.classList.remove('show');
-        //});
-
+    
         // Show background gradient on larger screens
         const bgGradient = document.getElementById('bgGradient');
         function updateBackgroundGradient() {

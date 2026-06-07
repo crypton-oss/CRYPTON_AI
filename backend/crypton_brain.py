@@ -9,7 +9,6 @@ class CryptonBrain:
         self.api_key = os.getenv("OPENROUTER_API_KEY")
         self.model_name = os.getenv("MODEL_NAME")
         self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
             api_key=self.api_key
         )
         
